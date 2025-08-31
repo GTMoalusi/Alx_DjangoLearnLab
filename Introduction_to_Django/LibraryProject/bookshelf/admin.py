@@ -5,6 +5,6 @@ from .models import Book
 @admin.register(Book)
 class BooKAdmin(admin.ModelAdmin):
    list_display = ("title", "author", "publication_date")
-   list_filter = ("author", "publication_date")
+   list_filter = ("author", "publication_year")
    search_fields = ("title", "author")
    date_hierarchy = "publication_date"
