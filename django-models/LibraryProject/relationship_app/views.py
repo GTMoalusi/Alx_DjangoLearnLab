@@ -20,5 +20,5 @@ class LibraryDetailView(DetailView):
     It automatically fetches the object based on the primary key (pk) in the URL.
     """
     model = Library
-    template_name = 'library_detail.html'
+    template_name = 'library_detail.html', 'list_books.html'
     context_object_name = 'library'
