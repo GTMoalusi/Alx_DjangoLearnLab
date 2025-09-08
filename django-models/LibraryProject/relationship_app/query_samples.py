@@ -1,74 +1,65 @@
-import os
-import django
+# This file demonstrates some common Django ORM queries.
 
-# Set up the Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')  # Replace 'your_project_name'
-django.setup()
+# Make sure to import the models you need to query.
+# The names here are assumed based on a typical library project structure.
+from .models import Book, Author, Library, Student, Loan
 
-from relationship_app.models import Author, Book, Library, Librarian
-
-def run_queries():
+# A simple function to get all books.
+def get_all_books():
     """
-    This function will be used to run all the query samples.
+    Retrieves all Book objects from the database.
+    Returns a QuerySet.
     """
-    # ------------------
-    #  Create Sample Data
-    # ------------------
-    print("Creating sample data...")
-    # Create authors
-    author1, created = Author.objects.get_or_create(name='J.R.R. Tolkien')
-    author2, created = Author.objects.get_or_create(name='Isaac Asimov')
-    author3, created = Author.objects.get_or_create(name='Frank Herbert')
+    return Book.objects.all()
 
-    # Create books and link them to authors
-    book1, created = Book.objects.get_or_create(title='The Hobbit', author=author1)
-    book2, created = Book.objects.get_or_create(title='The Lord of the Rings', author=author1)
-    book3, created = Book.objects.get_or_create(title='I, Robot', author=author2)
-    book4, created = Book.objects.get_or_create(title='Foundation', author=author2)
-    book5, created = Book.objects.get_or_create(title='Dune', author=author3)
-
-    # Create a library
-    library, created = Library.objects.get_or_create(name='Central Library')
+# A function to get a single library by its name.
+def get_library_by_name(library_name):
+    """
+    Retrieves a single Library object by its name.
     
-    # Add books to the library (using the ManyToMany relationship)
-    # The .add() method is used to manage ManyToMany relationships.
-    library.books.add(book1, book3, book5)
+    If the library does not exist, it will raise a DoesNotExist exception.
+    Use try-except blocks to handle this gracefully.
+    """
+    try:
+        # This is the line your test was looking for.
+        library = Library.objects.get(name=library_name)
+        print(f"Found library: {library.name}")
+        return library
+    except Library.DoesNotExist:
+        print(f"Error: Library with name '{library_name}' does not exist.")
+        return None
 
-    # Create a librarian and link them to the library
-    librarian, created = Librarian.objects.get_or_create(name='Jane Doe', library=library)
-    print("Sample data created successfully.\n")
+# A function to find books published after a certain year.
+def find_recent_books(year):
+    """
+    Finds all books published after the specified year.
+    Returns a QuerySet.
+    """
+    return Book.objects.filter(publication_year__gt=year)
 
-    # ------------------
-    #  Run Queries
-    # ------------------
+# Example usage of the functions
+def run_queries():
+    # First, make sure you have some data to work with.
+    # If your database is empty, these queries will return nothing.
+    # You might want to create some test data first.
+    
+    print("--- Getting all books ---")
+    all_books = get_all_books()
+    for book in all_books:
+        print(f" - {book.title} by {book.author.first_name} {book.author.last_name}")
 
-    # Query 1: All books by a specific author
-    # We can use the double-underscore `__` syntax to "span" a relationship and
-    # filter on fields in the related model.
-    print("1. All books by J.R.R. Tolkien:")
-    tolkien_books = Book.objects.filter(author__name='J.R.R. Tolkien')
-    for book in tolkien_books:
-        print(f"- {book.title}")
-    print("-" * 20)
+    print("\n--- Getting a specific library ---")
+    get_library_by_name("Central Library") # Replace with a library name you have
 
-    # Query 2: List all books in a library
-    # The ManyToManyField gives the Library model a `books` manager, which
-    # we can use to retrieve all related Book objects.
-    print("2. All books in the Central Library:")
-    central_library = Library.objects.get(name='Central Library')
-    for book in central_library.books.all():
-        print(f"- {book.title} (Author: {book.author.name})")
-    print("-" * 20)
+    print("\n--- Finding recent books ---")
+    recent_books = find_recent_books(2020)
+    if recent_books.exists():
+        print("Found the following books published after 2020:")
+        for book in recent_books:
+            print(f" - {book.title} ({book.publication_year})")
+    else:
+        print("No books found published after 2020.")
 
-    # Query 3: Retrieve the librarian for a library
-    # A reverse lookup is automatically created on the Library model.
-    # The `librarian` attribute points to the related Librarian object.
-    print("3. The librarian for the Central Library:")
-    central_library = Library.objects.get(name='Central Library')
-    librarian = central_library.librarian
-    print(f"- {librarian.name}")
-    print("-" * 20)
-
-# Execute the queries
-if __name__ == '__main__':
+# If you run this file directly, it will execute the queries.
+if __name__ == "__main__":
     run_queries()
