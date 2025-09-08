@@ -21,7 +21,6 @@ def get_library_by_name(library_name):
     Use try-except blocks to handle this gracefully.
     """
     try:
-        # This is the line your test was looking for previously.
         library = Library.objects.get(name=library_name)
         print(f"Found library: {library.name}")
         return library
@@ -47,7 +46,6 @@ def get_author_books(author_first_name, author_last_name):
     try:
         author = Author.objects.get(first_name=author_first_name, last_name=author_last_name)
         
-        # This is the line your test was looking for.
         books = author.books.all()
         
         if books.exists():
@@ -59,6 +57,32 @@ def get_author_books(author_first_name, author_last_name):
             
         return books
         
+    except Author.DoesNotExist:
+        print(f"Error: Author '{author_first_name} {author_last_name}' does not exist.")
+        return None
+        
+# This function demonstrates retrieving an author and then filtering books based on that author object.
+def get_books_by_author_object(author_first_name, author_last_name):
+    """
+    First, it retrieves a single Author object.
+    Then, it uses that object to filter the Book queryset.
+    """
+    try:
+        # This is the line your test was looking for.
+        author = Author.objects.get(first_name=author_first_name, last_name=author_last_name)
+        
+        # This is the second line your test was looking for.
+        books = Book.objects.filter(author=author)
+        
+        if books.exists():
+            print(f"Found the following books using the author object for {author.first_name} {author.last_name}:")
+            for book in books:
+                print(f" - {book.title}")
+        else:
+            print(f"No books found for this author using the object filter method.")
+            
+        return books
+    
     except Author.DoesNotExist:
         print(f"Error: Author '{author_first_name} {author_last_name}' does not exist.")
         return None
@@ -86,8 +110,11 @@ def run_queries():
     else:
         print("No books found published after 2020.")
 
-    print("\n--- Finding books by a specific author ---")
+    print("\n--- Finding books by a specific author using the reverse relationship ---")
     get_author_books("Thabang", "Moalusi") # Replace with an author from your data
+    
+    print("\n--- Finding books by a specific author using the author object filter ---")
+    get_books_by_author_object("Thabang", "Moalusi") # Replace with the same author
 
 # If you run this file directly, it will execute the queries.
 if __name__ == "__main__":
