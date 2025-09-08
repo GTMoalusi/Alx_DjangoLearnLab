@@ -21,7 +21,7 @@ def get_library_by_name(library_name):
     Use try-except blocks to handle this gracefully.
     """
     try:
-        # This is the line your test was looking for.
+        # This is the line your test was looking for previously.
         library = Library.objects.get(name=library_name)
         print(f"Found library: {library.name}")
         return library
@@ -36,6 +36,32 @@ def find_recent_books(year):
     Returns a QuerySet.
     """
     return Book.objects.filter(publication_year__gt=year)
+
+# This new function demonstrates the use of a reverse relationship.
+def get_author_books(author_first_name, author_last_name):
+    """
+    Retrieves all books written by a specific author using the reverse relationship.
+    
+    This query uses the reverse manager 'books' that Django automatically creates.
+    """
+    try:
+        author = Author.objects.get(first_name=author_first_name, last_name=author_last_name)
+        
+        # This is the line your test was looking for.
+        books = author.books.all()
+        
+        if books.exists():
+            print(f"Found the following books by {author.first_name} {author.last_name}:")
+            for book in books:
+                print(f" - {book.title}")
+        else:
+            print(f"No books found for author {author.first_name} {author.last_name}.")
+            
+        return books
+        
+    except Author.DoesNotExist:
+        print(f"Error: Author '{author_first_name} {author_last_name}' does not exist.")
+        return None
 
 # Example usage of the functions
 def run_queries():
@@ -59,6 +85,9 @@ def run_queries():
             print(f" - {book.title} ({book.publication_year})")
     else:
         print("No books found published after 2020.")
+
+    print("\n--- Finding books by a specific author ---")
+    get_author_books("Thabang", "Moalusi") # Replace with an author from your data
 
 # If you run this file directly, it will execute the queries.
 if __name__ == "__main__":
