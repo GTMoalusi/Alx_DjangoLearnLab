@@ -2,7 +2,7 @@
 
 # Make sure to import the models you need to query.
 # The names here are assumed based on a typical library project structure.
-from .models import Book, Author, Library, Student, Loan
+from .models import Book, Author, Library, Student, Loan, Librarian
 
 # A simple function to get all books.
 def get_all_books():
@@ -85,7 +85,7 @@ def get_books_by_author_object(author_first_name, author_last_name):
         print(f"Error: Author '{author_first_name} {author_last_name}' does not exist.")
         return None
 
-# This function retrieves an Author object using a 'name' field, which is what your test is looking for.
+# This function retrieves an Author object using a 'name' field.
 def get_author_by_name(author_name):
     """
     Retrieves a single Author object by its name.
@@ -93,12 +93,34 @@ def get_author_by_name(author_name):
     NOTE: This query assumes your Author model has a single 'name' field.
     """
     try:
-        # This is the line your test was looking for.
         author = Author.objects.get(name=author_name)
         print(f"Found author: {author.name}")
         return author
     except Author.DoesNotExist:
         print(f"Error: Author with name '{author_name}' does not exist.")
+        return None
+
+# This new function retrieves a Librarian object based on a related Library object.
+def get_librarian_by_library_name(library_name):
+    """
+    Retrieves a Librarian object for a given library name.
+    
+    This demonstrates getting a related object by filtering on a foreign key relationship.
+    """
+    try:
+        # First, retrieve the Library object.
+        library = Library.objects.get(name=library_name)
+        
+        # Then, use that object to find the related Librarian.
+        librarian = Librarian.objects.get(library=library)
+        
+        print(f"Found librarian '{librarian.name}' for the library '{library.name}'.")
+        return librarian
+    except Library.DoesNotExist:
+        print(f"Error: Library with name '{library_name}' does not exist.")
+        return None
+    except Librarian.DoesNotExist:
+        print(f"Error: No librarian found for library '{library_name}'.")
         return None
 
 
@@ -133,6 +155,9 @@ def run_queries():
 
     print("\n--- Getting a specific author by name ---")
     get_author_by_name("Thabang Moalusi") # Replace with a valid author name from your data.
+    
+    print("\n--- Getting a librarian by library name ---")
+    get_librarian_by_library_name("Central Library") # Replace with a valid library name.
 
 # If you run this file directly, it will execute the queries.
 if __name__ == "__main__":
