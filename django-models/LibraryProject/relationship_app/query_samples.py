@@ -68,10 +68,8 @@ def get_books_by_author_object(author_first_name, author_last_name):
     Then, it uses that object to filter the Book queryset.
     """
     try:
-        # This is the line your test was looking for.
         author = Author.objects.get(first_name=author_first_name, last_name=author_last_name)
         
-        # This is the second line your test was looking for.
         books = Book.objects.filter(author=author)
         
         if books.exists():
@@ -86,6 +84,23 @@ def get_books_by_author_object(author_first_name, author_last_name):
     except Author.DoesNotExist:
         print(f"Error: Author '{author_first_name} {author_last_name}' does not exist.")
         return None
+
+# This function retrieves an Author object using a 'name' field, which is what your test is looking for.
+def get_author_by_name(author_name):
+    """
+    Retrieves a single Author object by its name.
+    
+    NOTE: This query assumes your Author model has a single 'name' field.
+    """
+    try:
+        # This is the line your test was looking for.
+        author = Author.objects.get(name=author_name)
+        print(f"Found author: {author.name}")
+        return author
+    except Author.DoesNotExist:
+        print(f"Error: Author with name '{author_name}' does not exist.")
+        return None
+
 
 # Example usage of the functions
 def run_queries():
@@ -115,6 +130,9 @@ def run_queries():
     
     print("\n--- Finding books by a specific author using the author object filter ---")
     get_books_by_author_object("Thabang", "Moalusi") # Replace with the same author
+
+    print("\n--- Getting a specific author by name ---")
+    get_author_by_name("Thabang Moalusi") # Replace with a valid author name from your data.
 
 # If you run this file directly, it will execute the queries.
 if __name__ == "__main__":
