@@ -11,7 +11,8 @@ def list_books(request):
     context = {
         'books': books
     }
-    return render(request, 'list_books.html', context)
+    # This line has been updated with the full path to the template.
+    return render(request, 'relationship_app/list_books.html', context)
 
 # Class-based view to display details for a specific library
 class LibraryDetailView(DetailView):
@@ -20,5 +21,6 @@ class LibraryDetailView(DetailView):
     It automatically fetches the object based on the primary key (pk) in the URL.
     """
     model = Library
-    template_name = 'library_detail.html', 'list_books.html'
+    # The template_name should be a single string.
+    template_name = 'library_detail.html'
     context_object_name = 'library'
