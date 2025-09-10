@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+from django.template import loader
 from django.shortcuts import render
 from django.views.generic import DetailView
 from .models import Book
@@ -9,11 +11,13 @@ def list_books(request):
     """
     Retrieves all Book objects from the database and renders a list.
     """
-    books = Book.objects.all()
+    books = Book.objects.all().values()
+    template = loader.get_template('list_books.html')
     context = {
         'books': books
     }
     return render(request, 'relationship_app/list_books.html', context)
+   #  return HttpResponse(template.render(context, request))
 
 # Class-based view to display details for a specific library
 class LibraryDetailView(DetailView):
