@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library App</title>
+    <!-- Use Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center">
+      <h1 class="text-3xl font-bold text-gray-800 mb-4">
+        Welcome to the Library Project
+      </h1>
+      <p class="text-gray-600 mb-6">
+        This is the home page of your application. You can navigate to different
+        sections using the links below.
+      </p>
+      <div class="space-y-4">
+        <a
+          href="{% url 'book_list' %}"
+          class="block w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          View All Books
+        </a>
+        <a
+          href="{% url 'library_list' %}"
+          class="block w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+        >
+          View All Libraries
+        </a>
+        <a
+          href="{% url 'add_book' %}"
+          class="block w-full px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors"
+        >
+          Add a New Book
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
