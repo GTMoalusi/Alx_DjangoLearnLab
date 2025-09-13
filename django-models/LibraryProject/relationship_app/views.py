@@ -545,6 +545,93 @@
 #         return redirect('library_list')
 #     return render(request, 'relationship_app/delete_library.html', {'library': library})
 
+# from django.shortcuts import render, redirect, get_object_or_404
+# from django.contrib.auth.decorators import login_required, permission_required
+# from .models import Book, Library
+# from .forms import BookForm, LibraryForm
+
+# # A simple index view for the root URL
+# def index(request):
+#     return render(request, 'relationship_app/index.html')
+
+# # View to display a list of all libraries
+# def library_list(request):
+#     libraries = Library.objects.all()
+#     return render(request, 'relationship_app/library_list.html', {'libraries': libraries})
+
+# # View to display a list of all books
+# def book_list(request):
+#     books = Book.objects.all()
+#     return render(request, 'relationship_app/book_list.html', {'books': books})
+
+# # View to add a new book
+# @permission_required('relationship_app.can_add_book', raise_exception=True)
+# def add_book(request):
+#     if request.method == 'POST':
+#         form = BookForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('book_list')
+#     else:
+#         form = BookForm()
+#     return render(request, 'relationship_app/add_book.html', {'form': form})
+
+# # View to change an existing book
+# @permission_required('relationship_app.can_change_book', raise_exception=True)
+# def change_book(request, pk):
+#     book = get_object_or_404(Book, pk=pk)
+#     if request.method == 'POST':
+#         form = BookForm(request.POST, instance=book)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('book_list')
+#     else:
+#         form = BookForm(instance=book)
+#     return render(request, 'relationship_app/change_book.html', {'form': form})
+    
+# # View to delete an existing book
+# @permission_required('relationship_app.can_delete_book', raise_exception=True)
+# def delete_book(request, pk):
+#     book = get_object_or_404(Book, pk=pk)
+#     if request.method == 'POST':
+#         book.delete()
+#         return redirect('book_list')
+#     return render(request, 'relationship_app/delete_book.html', {'book': book})
+    
+# # View to add a new library
+# @permission_required('relationship_app.can_add_library', raise_exception=True)
+# def add_library(request):
+#     if request.method == 'POST':
+#         form = LibraryForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('library_list')
+#     else:
+#         form = LibraryForm()
+#     return render(request, 'relationship_app/add_library.html', {'form': form})
+
+# # View to change an existing library
+# @permission_required('relationship_app.can_change_library', raise_exception=True)
+# def change_library(request, pk):
+#     library = get_object_or_404(Library, pk=pk)
+#     if request.method == 'POST':
+#         form = LibraryForm(request.POST, instance=library)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('library_list')
+#     else:
+#         form = LibraryForm(instance=library)
+#     return render(request, 'relationship_app/change_library.html', {'form': form})
+
+# # View to delete an existing library
+# @permission_required('relationship_app.can_delete_library', raise_exception=True)
+# def delete_library(request, pk):
+#     library = get_object_or_404(Library, pk=pk)
+#     if request.method == 'POST':
+#         library.delete()
+#         return redirect('library_list')
+#     return render(request, 'relationship_app/delete_library.html', {'library': library})
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import Book, Library
@@ -565,7 +652,7 @@ def book_list(request):
     return render(request, 'relationship_app/book_list.html', {'books': books})
 
 # View to add a new book
-@permission_required('relationship_app.can_add_book', raise_exception=True)
+@permission_required('relationship_app.add_book', raise_exception=True)
 def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
@@ -577,7 +664,7 @@ def add_book(request):
     return render(request, 'relationship_app/add_book.html', {'form': form})
 
 # View to change an existing book
-@permission_required('relationship_app.can_change_book', raise_exception=True)
+@permission_required('relationship_app.change_book', raise_exception=True)
 def change_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
@@ -590,7 +677,7 @@ def change_book(request, pk):
     return render(request, 'relationship_app/change_book.html', {'form': form})
     
 # View to delete an existing book
-@permission_required('relationship_app.can_delete_book', raise_exception=True)
+@permission_required('relationship_app.delete_book', raise_exception=True)
 def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
@@ -599,7 +686,7 @@ def delete_book(request, pk):
     return render(request, 'relationship_app/delete_book.html', {'book': book})
     
 # View to add a new library
-@permission_required('relationship_app.can_add_library', raise_exception=True)
+@permission_required('relationship_app.add_library', raise_exception=True)
 def add_library(request):
     if request.method == 'POST':
         form = LibraryForm(request.POST)
@@ -611,7 +698,7 @@ def add_library(request):
     return render(request, 'relationship_app/add_library.html', {'form': form})
 
 # View to change an existing library
-@permission_required('relationship_app.can_change_library', raise_exception=True)
+@permission_required('relationship_app.change_library', raise_exception=True)
 def change_library(request, pk):
     library = get_object_or_404(Library, pk=pk)
     if request.method == 'POST':
@@ -624,7 +711,7 @@ def change_library(request, pk):
     return render(request, 'relationship_app/change_library.html', {'form': form})
 
 # View to delete an existing library
-@permission_required('relationship_app.can_delete_library', raise_exception=True)
+@permission_required('relationship_app.delete_library', raise_exception=True)
 def delete_library(request, pk):
     library = get_object_or_404(Library, pk=pk)
     if request.method == 'POST':
