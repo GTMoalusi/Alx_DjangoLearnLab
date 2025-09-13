@@ -195,32 +195,69 @@
 #       ("can_add_library", "Can add library"),
 #     ] 
 
+# from django.db import models
+
+# class Library(models.Model):
+#     name = models.CharField(max_length=200)
+
+#     class Meta:
+#         permissions = [
+#             ("can_add_library", "Can add a new library"),
+#             # Add other custom library permissions here if needed
+#         ]
+
+#     def __str__(self):
+#         return self.name
+
+# class Book(models.Model):
+#     title = models.CharField(max_length=200)
+#     author = models.CharField(max_length=200)
+#     publication_date = models.DateField()
+#     library = models.ForeignKey(Library, on_delete=models.CASCADE)
+
+#     class Meta:
+#         permissions = [
+#             ("can_add_book", "Can add a new book"),
+#             ("can_change_book", "Can change existing book data"),
+#             ("can_delete_book", "Can delete a book"),
+#         ]
+
+#     def __str__(self):
+#         return self.title
+
 from django.db import models
 
+# Define the Library model first, as it's a foreign key for Book
 class Library(models.Model):
-    name = models.CharField(max_length=200)
-
-    class Meta:
-        permissions = [
-            ("can_add_library", "Can add a new library"),
-            # Add other custom library permissions here if needed
-        ]
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        permissions = [
+            ("can_add_library", "Can add a new library"),
+            ("can_change_library", "Can change an existing library"),
+            ("can_delete_library", "Can delete a library"),
+        ]
+
+
 class Book(models.Model):
     title = models.CharField(max_length=200)
-    author = models.CharField(max_length=200)
-    publication_date = models.DateField()
-    library = models.ForeignKey(Library, on_delete=models.CASCADE)
+    author = models.CharField(max_length=100)
+    # These fields are required by the BookForm
+    publication_year = models.IntegerField(null=True, blank=True)
+    isbn = models.CharField(max_length=13, unique=True, null=True, blank=True)
+    # Add the Foreign Key relationship to Library
+    library = models.ForeignKey(Library, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
 
     class Meta:
         permissions = [
             ("can_add_book", "Can add a new book"),
-            ("can_change_book", "Can change existing book data"),
+            ("can_change_book", "Can change an existing book"),
             ("can_delete_book", "Can delete a book"),
         ]
-
-    def __str__(self):
-        return self.title

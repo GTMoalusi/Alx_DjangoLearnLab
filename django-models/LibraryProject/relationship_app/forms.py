@@ -46,6 +46,26 @@
 #         # Make sure the fields list includes 'isbn' and 'library'
 #         fields = ['title', 'author', 'publication_year', 'isbn', 'library']
 
+# from django import forms
+# from .models import Book, Library
+
+# class BookForm(forms.ModelForm):
+#     """
+#     Form for creating and updating Book objects.
+#     """
+#     class Meta:
+#         model = Book
+#         # The fields listed here MUST match the fields in your Book model.
+#         fields = ['title', 'author', 'publication_year', 'isbn', 'library']
+
+# class LibraryForm(forms.ModelForm):
+#     """
+#     Form for creating and updating Library objects.
+#     """
+#     class Meta:
+#         model = Library
+#         fields = '__all__'
+
 from django import forms
 from .models import Book, Library
 
@@ -55,7 +75,6 @@ class BookForm(forms.ModelForm):
     """
     class Meta:
         model = Book
-        # The fields listed here MUST match the fields in your Book model.
         fields = ['title', 'author', 'publication_year', 'isbn', 'library']
 
 class LibraryForm(forms.ModelForm):
@@ -64,4 +83,4 @@ class LibraryForm(forms.ModelForm):
     """
     class Meta:
         model = Library
-        fields = '__all__'
+        fields = ['name', 'location']
