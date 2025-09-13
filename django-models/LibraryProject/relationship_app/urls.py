@@ -45,6 +45,26 @@
 #     path('libraries/add/', views.add_library, name='add_library'),
 # ]
 
+# from django.urls import path
+# from . import views
+
+# urlpatterns = [
+#     # Main page
+#     path('', views.index, name='index'),
+    
+#     # URL patterns for Books with permission checks
+#     path('books/', views.book_list, name='book_list'),
+#     path('books/add/', views.add_book, name='add_book'),
+#     path('books/change/<int:pk>/', views.change_book, name='change_book'),
+#     path('books/delete/<int:pk>/', views.delete_book, name='delete_book'),
+
+#     # URL patterns for Libraries
+#     path('libraries/', views.library_list, name='library_list'),
+#     path('libraries/add/', views.add_library, name='add_library'),
+#     path('libraries/change/<int:pk>/', views.change_library, name='change_library'),
+#     path('libraries/delete/<int:pk>/', views.delete_library, name='delete_library'),
+# ]
+
 from django.urls import path
 from . import views
 
@@ -54,8 +74,8 @@ urlpatterns = [
     
     # URL patterns for Books with permission checks
     path('books/', views.book_list, name='book_list'),
-    path('books/add/', views.add_book, name='add_book'),
-    path('books/change/<int:pk>/', views.change_book, name='change_book'),
+    path('add_book/', views.add_book, name='add_book'),
+    path('edit_book/<int:pk>/', views.change_book, name='edit_book'),
     path('books/delete/<int:pk>/', views.delete_book, name='delete_book'),
 
     # URL patterns for Libraries
