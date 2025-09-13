@@ -189,3 +189,8 @@ class Book(models.Model):
 
     def __str__(self):
         return f"{self.title} by {self.author}"
+    
+class Meta:
+    permissions = [
+      ("can_add_library", "Can add library"),
+    ] 
