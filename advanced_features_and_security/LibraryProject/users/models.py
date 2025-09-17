@@ -81,15 +81,59 @@
 #         """Return a string representation of the user."""
 #         return self.username
 
-from django.db import models
+# from django.db import models
+# from django.contrib.auth.models import AbstractUser, BaseUserManager
+
+# class CustomUserManager(BaseUserManager):
+#     """
+#     Custom user model manager where email is the unique identifier
+#     for authentication instead of usernames.
+#     """
+#     def create_user(self, email, password, **extra_fields):
+#         if not email:
+#             raise ValueError("The Email field must be set")
+#         email = self.normalize_email(email)
+#         user = self.model(email=email, **extra_fields)
+#         user.set_password(password)
+#         user.save()
+#         return user
+
+#     def create_superuser(self, email, password, **extra_fields):
+#         extra_fields.setdefault("is_staff", True)
+#         extra_fields.setdefault("is_superuser", True)
+#         extra_fields.setdefault("is_active", True)
+
+#         if extra_fields.get("is_staff") is not True:
+#             raise ValueError("Superuser must have is_staff=True.")
+#         if extra_fields.get("is_superuser") is not True:
+#             raise ValueError("Superuser must have is_superuser=True.")
+
+#         return self.create_user(email, password, **extra_fields)
+
+# class CustomUser(AbstractUser):
+#     username = None
+#     email = models.EmailField("email address", unique=True)
+
+#     USERNAME_FIELD = "email"
+#     REQUIRED_FIELDS = []
+
+#     objects = CustomUserManager()
+
+#     def __str__(self):
+#         return self.email
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
 
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifier
     for authentication instead of usernames.
     """
-    def create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Creates and saves a User with the given email and password.
+        """
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -98,7 +142,10 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Creates and saves a SuperUser with the given email and password.
+        """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
@@ -107,17 +154,28 @@ class CustomUserManager(BaseUserManager):
             raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
-
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField("email address", unique=True)
+    
+    # Add related_name to avoid clashes with the default User model
+    groups = models.ManyToManyField(
+        "auth.Group",
+        related_name="custom_user_groups",
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        related_name="custom_user_permissions",
+        blank=True,
+    )
+
+    objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
-
-    objects = CustomUserManager()
 
     def __str__(self):
         return self.email
