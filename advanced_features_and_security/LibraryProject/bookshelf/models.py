@@ -242,20 +242,86 @@
 #     def __str__(self):
 #         return self.name
 
-from django.db import models
+# from django.db import models
 
-# The Book model that the relationship_app depends on
+# # The Book model that the relationship_app depends on
+# class Book(models.Model):
+#     title = models.CharField(max_length=200)
+#     author = models.CharField(max_length=100)
+
+#     def __str__(self):
+#         return self.title
+
+# # The Library model that the relationship_app depends on
+# class Library(models.Model):
+#     name = models.CharField(max_length=100)
+#     location = models.CharField(max_length=200)
+
+#     def __str__(self):
+#         return self.name
+
+# from django.db import models
+# from django.conf import settings
+# from django.contrib.auth.models import UserManager, AbstractUser
+
+# class CustomUserManager(UserManager):
+#     pass
+
+# class CustomUser(AbstractUser):
+#     objects = CustomUserManager()
+
+# class Book(models.Model):
+#     title = models.CharField(max_length=200)
+#     author = models.CharField(max_length=100)
+#     publication_year = models.IntegerField(blank=True, null=True)
+
+#     class Meta:
+#         # Define custom permissions for this model
+#         permissions = (
+#             ("can_view", "Can view book"),
+#             ("can_create", "Can create book"),
+#             ("can_edit", "Can edit book"),
+#             ("can_delete", "Can delete book"),
+#         )
+#         # To avoid name conflicts, these are automatically prefixed with the app name,
+#         # so you will reference them as 'bookshelf.can_view', 'bookshelf.can_create', etc.
+
+#     def __str__(self):
+#         return self.title
+
+from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import UserManager, AbstractUser
+
+class CustomUserManager(UserManager):
+    pass
+
+class CustomUser(AbstractUser):
+    objects = CustomUserManager()
+
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
+    publication_year = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        # Define custom permissions for this model
+        permissions = (
+            ("can_view", "Can view book"),
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_delete", "Can delete book"),
+        )
+        # To avoid name conflicts, these are automatically prefixed with the app name,
+        # so you will reference them as 'bookshelf.can_view', 'bookshelf.can_create', etc.
 
     def __str__(self):
         return self.title
 
-# The Library model that the relationship_app depends on
+# This model has been added back to fix the ImportError
 class Library(models.Model):
-    name = models.CharField(max_length=100)
-    location = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.name
