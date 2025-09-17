@@ -71,3 +71,33 @@ Log in as an 'Editors' user: You should be able to create and edit books, but no
 Log in as a 'Viewers' user: You should only be able to view the list of books. Accessing the create, edit, or delete views should result in a 403 Forbidden error.
 
 Log in as an 'Admins' user: You should have full control and be able to create, view, edit, and delete books.
+
+#=================================================================================#
+Implemented Security Measures
+This document outlines the security enhancements made to the Django application, following the best practices for preventing common web vulnerabilities.
+
+1. Secure Settings (settings.py)
+   DEBUG = False: Ensures that sensitive debugging information is not exposed to the public in a production environment.
+
+CSRF_COOKIE_SECURE = True: Forces the csrftoken cookie to be sent over HTTPS only, protecting against man-in-the-middle attacks.
+
+SESSION_COOKIE_SECURE = True: Forces the session cookie to be sent over HTTPS only, similarly protecting user sessions.
+
+SECURE_CONTENT_TYPE_NOSNIFF = True: Adds the X-Content-Type-Options: nosniff header, preventing browsers from incorrectly interpreting file types and mitigating XSS attacks.
+
+SECURE_BROWSER_XSS_FILTER = True: Adds the X-XSS-Protection header for older browsers.
+
+X_FRAME_OPTIONS = 'DENY': Prevents the site from being loaded in a frame, protecting against clickjacking attacks.
+
+2. CSRF Protection (Templates)
+   All forms that accept user input are now required to include the {% csrf_token %} template tag. This automatically inserts a hidden input field with a unique, user-specific token. Django's middleware verifies this token on form submission, rejecting any requests that do not have a valid token. This protects against Cross-Site Request Forgery (CSRF).
+
+3. Secure Data Access (views.py)
+   ORM Usage: Direct SQL queries or string formatting for user-provided input have been replaced with the Django ORM. The ORM's methods, such as filter(), automatically handle the parameterization of queries, which makes them immune to SQL injection attacks.
+
+Input Handling: The search functionality in bookshelf/views.py now uses a safe, Q-object-based query to filter results, ensuring user input does not directly affect the database query structure.
+
+Custom CSRF Failure View: A custom view is now available to provide a more user-friendly error page if a CSRF attack is detected, rather than showing a generic server error.
+
+4. Content Security Policy (CSP)
+   The django-csp middleware has been configured to add a Content-Security-Policy header to all responses. This policy restricts where the browser can load content (scripts, styles, etc.) from, preventing many types of XSS attacks.

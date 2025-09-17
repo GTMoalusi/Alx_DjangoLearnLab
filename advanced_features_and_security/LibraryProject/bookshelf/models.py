@@ -289,6 +289,43 @@
 #     def __str__(self):
 #         return self.title
 
+# from django.db import models
+# from django.conf import settings
+# from django.contrib.auth.models import UserManager, AbstractUser
+
+# class CustomUserManager(UserManager):
+#     pass
+
+# class CustomUser(AbstractUser):
+#     objects = CustomUserManager()
+
+# class Book(models.Model):
+#     title = models.CharField(max_length=200)
+#     author = models.CharField(max_length=100)
+#     publication_year = models.IntegerField(blank=True, null=True)
+
+#     class Meta:
+#         # Define custom permissions for this model
+#         permissions = (
+#             ("can_view", "Can view book"),
+#             ("can_create", "Can create book"),
+#             ("can_edit", "Can edit book"),
+#             ("can_delete", "Can delete book"),
+#         )
+#         # To avoid name conflicts, these are automatically prefixed with the app name,
+#         # so you will reference them as 'bookshelf.can_view', 'bookshelf.can_create', etc.
+
+#     def __str__(self):
+#         return self.title
+
+# # This model has been added back to fix the ImportError
+# class Library(models.Model):
+#     name = models.CharField(max_length=200)
+#     address = models.CharField(max_length=200, blank=True)
+
+#     def __str__(self):
+#         return self.name
+
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import UserManager, AbstractUser
@@ -297,6 +334,22 @@ class CustomUserManager(UserManager):
     pass
 
 class CustomUser(AbstractUser):
+    # Added related_name to resolve clashes with auth.User
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='custom_user_groups',
+        blank=True,
+        help_text=('The groups this user belongs to. A user will get all permissions '
+                   'granted to each of their groups.'),
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='custom_user_permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
     objects = CustomUserManager()
 
 class Book(models.Model):
@@ -305,7 +358,6 @@ class Book(models.Model):
     publication_year = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        # Define custom permissions for this model
         permissions = (
             ("can_view", "Can view book"),
             ("can_create", "Can create book"),
@@ -318,7 +370,6 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-# This model has been added back to fix the ImportError
 class Library(models.Model):
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=200, blank=True)

@@ -1,4 +1,4 @@
-<!-- list_books.html -->
+list_books.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -31,4 +31,23 @@
       {% endfor %}
     </ul>
   </body>
-</html> -->
+</html>
+
+<h1>Book List</h1>
+
+<--
+    This is an example of a search form. The {% csrf_token %} tag is included
+    to protect against CSRF attacks. It generates a hidden input field with a
+    unique token for each user session.
+-->
+<form method="get" action="">
+  {% csrf_token %}
+  <input type="text" name="q" placeholder="Search for books..." />
+  <button type="submit">Search</button>
+</form>
+
+<ul>
+  {% for book in books %}
+  <li>{{ book.title }} by {{ book.author }}</li>
+  {% endfor %}
+</ul>
