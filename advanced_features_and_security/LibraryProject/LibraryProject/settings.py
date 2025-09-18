@@ -413,3 +413,58 @@ CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'",)
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",)
 CSP_IMG_SRC = ("'self'",)
+
+
+"""
+Django settings for LibraryProject project.
+... (other settings) ...
+
+# -----------------------------------------------------------------------------
+# Security Settings
+# -----------------------------------------------------------------------------
+# Enforces HTTPS redirects for all non-HTTPS requests.
+# It's essential to set this to True in a production environment to ensure
+# all traffic is secure.
+SECURE_SSL_REDIRECT = True
+
+# When running behind a reverse proxy, this header tells Django that the
+# request was originally secure (HTTPS). This is necessary for
+# SECURE_SSL_REDIRECT to work correctly. The tuple specifies the
+# header to check and the value that indicates a secure connection.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Sets the HSTS header. This tells the browser to only communicate with
+# your site using HTTPS for the specified number of seconds (here, one year).
+# This helps prevent man-in-the-middle attacks.
+SECURE_HSTS_SECONDS = 31536000
+
+# Includes subdomains in the HSTS policy.
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Allows your domain to be included in the HSTS preload list maintained by browsers.
+# This requires a separate submission to the HSTS preload list website.
+SECURE_HSTS_PRELOAD = True
+
+# Ensures that session cookies are only sent over secure HTTPS connections.
+SESSION_COOKIE_SECURE = True
+
+# Ensures that CSRF cookies are only sent over secure HTTPS connections.
+CSRF_COOKIE_SECURE = True
+
+# Prevents the site from being embedded in an iframe, protecting against
+# clickjacking attacks.
+X_FRAME_OPTIONS = 'DENY'
+
+# Prevents browsers from "MIME-sniffing" the content type,
+# which can help mitigate some types of XSS attacks.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# This header is now largely obsolete in modern browsers but can provide
+# a fallback for older ones. It enables the browser’s built-in XSS filter.
+# Note: Newer Django versions may deprecate this.
+SECURE_BROWSER_XSS_FILTER = True
+
+# -----------------------------------------------------------------------------
+# End of Security Settings
+# -----------------------------------------------------------------------------
+"""
