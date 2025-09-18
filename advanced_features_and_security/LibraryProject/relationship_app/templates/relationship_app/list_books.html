@@ -40,7 +40,7 @@ list_books.html -->
     to protect against CSRF attacks. It generates a hidden input field with a
     unique token for each user session.
 -->
-<form method="get" action="">
+<!-- <form method="get" action="">
   {% csrf_token %}
   <input type="text" name="q" placeholder="Search for books..." />
   <button type="submit">Search</button>
@@ -50,4 +50,4 @@ list_books.html -->
   {% for book in books %}
   <li>{{ book.title }} by {{ book.author }}</li>
   {% endfor %}
-</ul>
+</ul> -->
