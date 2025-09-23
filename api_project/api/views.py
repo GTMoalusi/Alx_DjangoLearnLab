@@ -5,7 +5,8 @@ from .serializers import BookSerializer
 
 # This view will handle GET and POST requests for a list of books.
 # It uses the Book model and the BookSerializer to perform these operations.
-class BookList(generics.ListCreateAPIView):
+# class BookList(generics.ListCreateAPIView):
+class BookList(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
