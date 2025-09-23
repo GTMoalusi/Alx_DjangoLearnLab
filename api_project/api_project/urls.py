@@ -14,11 +14,41 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# from django.contrib import admin
+# from django.urls import path, include
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     # Delegate all URLs starting with 'api/' to the 'api' app's urls.py
+#     path('api/', include('api.urls')),
+# ]
+
+# from django.contrib import admin
+# from django.urls import path, include
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     # This includes the URLs from your 'api' app,
+#     # which will handle the book endpoints.
+#     path('api/', include('api.urls')),
+#     # This includes the default DRF login/logout views, which are helpful
+#     # for browsing the API.
+#     path('api-auth/', include('rest_framework.urls')),
+# ]
+
 from django.contrib import admin
 from django.urls import path, include
+# Import the obtain_auth_token view
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Delegate all URLs starting with 'api/' to the 'api' app's urls.py
+    # This includes the URLs from your 'api' app,
+    # which will handle the book endpoints.
     path('api/', include('api.urls')),
+    # This includes the default DRF login/logout views, which are helpful
+    # for browsing the API.
+    path('api-auth/', include('rest_framework.urls')),
+    # Add a new path for token authentication
+    path('api-token-auth/', obtain_auth_token),
 ]

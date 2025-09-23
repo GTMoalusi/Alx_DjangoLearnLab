@@ -32,22 +32,45 @@
 #     queryset = Book.objects.all().order_by('id')
 #     serializer_class = BookSerializer
 
-from rest_framework import viewsets, generics
+# from rest_framework import viewsets, generics
+# from .models import Book
+# from .serializers import BookSerializer
+
+# # This view is for listing all books and creating new ones.
+# # It uses the generics.ListCreateAPIView to handle both GET (list) and POST (create) requests.
+# class BookList(generics.ListCreateAPIView):
+#     # Specify the queryset to be used. This will get all Book objects from the database.
+#     queryset = Book.objects.all()
+#     # Specify the serializer to be used for converting complex data to native Python datatypes.
+#     serializer_class = BookSerializer
+
+# # This viewset provides all CRUD operations (create, retrieve, update, delete) for the Book model.
+# # The DefaultRouter in urls.py will automatically create the URL patterns for these operations.
+# class BookViewSet(viewsets.ModelViewSet):
+#     # The queryset that this viewset will operate on.
+#     queryset = Book.objects.all()
+#     # The serializer to use for data serialization and deserialization.
+#     serializer_class = BookSerializer
+
+from rest_framework import viewsets, generics, permissions
 from .models import Book
 from .serializers import BookSerializer
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
-# This view is for listing all books and creating new ones.
-# It uses the generics.ListCreateAPIView to handle both GET (list) and POST (create) requests.
-class BookList(generics.ListCreateAPIView):
-    # Specify the queryset to be used. This will get all Book objects from the database.
-    queryset = Book.objects.all()
-    # Specify the serializer to be used for converting complex data to native Python datatypes.
-    serializer_class = BookSerializer
-
-# This viewset provides all CRUD operations (create, retrieve, update, delete) for the Book model.
-# The DefaultRouter in urls.py will automatically create the URL patterns for these operations.
+# This ViewSet will handle all CRUD operations for the Book model.
+# The permission_classes attribute is set to IsAuthenticated, meaning only
+# logged-in users with a valid token can perform any action (create,
+# retrieve, update, or delete).
 class BookViewSet(viewsets.ModelViewSet):
-    # The queryset that this viewset will operate on.
     queryset = Book.objects.all()
-    # The serializer to use for data serialization and deserialization.
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
+# This view will handle listing and creating books.
+# It uses IsAuthenticatedOrReadOnly, which allows unauthenticated users
+# to perform 'read' actions (GET) but requires authentication for 'write'
+# actions (POST, PUT, DELETE).
+class BookList(generics.ListCreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]

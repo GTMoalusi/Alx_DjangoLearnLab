@@ -42,6 +42,17 @@ ALLOWED_HOSTS = []
 #     'api',
 # ]
 
+# INSTALLED_APPS = [
+#     'django.contrib.admin',
+#     'django.contrib.auth',
+#     'django.contrib.contenttypes',
+#     'django.contrib.sessions',
+#     'django.contrib.messages',
+#     'django.contrib.staticfiles',
+#     'rest_framework', # Add this line
+#     'api', # Add this line
+# ]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,9 +60,30 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework', # Add this line
-    'api', # Add this line
+    'rest_framework',
+    'rest_framework.authtoken',  # Add this line for token authentication
+    'api.apps.ApiConfig',
+    # 'api',
 ]
+
+# ... other settings
+
+# Add this block to configure Django REST Framework
+REST_FRAMEWORK = {
+    # This sets the default authentication scheme for your entire project.
+    # We are using TokenAuthentication, which checks for a valid token
+    # in the request header.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    # This sets the default permissions. IsAuthenticatedOrReadOnly means
+    # authenticated users can do anything, but unauthenticated users can
+    # only read (GET, HEAD, OPTIONS). You can override this on a per-view basis.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
