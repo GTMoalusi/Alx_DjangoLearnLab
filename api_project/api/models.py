@@ -12,9 +12,11 @@ class Book(models.Model):
     publication_year = models.PositiveIntegerField()
 
     # A text field for a brief summary of the book.
+    # The blank=True and null=True attributes make this field optional.
     summary = models.TextField(blank=True, null=True)
 
     # A boolean field to track if the book is available.
+    # The default=True attribute sets the initial value for new books.
     is_available = models.BooleanField(default=True)
 
     def __str__(self):
