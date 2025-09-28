@@ -124,7 +124,7 @@ class Book(models.Model):
     title = models.CharField(max_length=255)
     # ForeignKey creates a one-to-many relationship: one Author can have many Books
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
-    publication_date = models.DateField()
+    publication_year = models.DateField()
     isbn = models.CharField(max_length=13, unique=True)
 
     def __str__(self):
