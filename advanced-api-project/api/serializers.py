@@ -173,43 +173,64 @@
 #         # Example if you only wanted specific fields:
 #         # fields = ['id', 'name', 'books'] 
 
-from rest_framework import serializers
-from .models import Author, Book 
-import datetime
+# from rest_framework import serializers
+# from .models import Author, Book 
+# import datetime
 
-# --- BookSerializer (Used as a standalone serializer and nested inside AuthorSerializer) ---
+# # --- BookSerializer (Used as a standalone serializer and nested inside AuthorSerializer) ---
+# class BookSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer for the Book model.
+#     Includes custom validation to ensure the publication year is not in the future.
+#     """
+#     class Meta:
+#         model = Book
+#         fields = '__all__'
+
+#     def validate_year_published(self, value):
+#         """
+#         Custom validation to check that the publication year is not in the future.
+#         """
+#         current_year = datetime.date.today().year
+
+#         if value > current_year:
+#             # Raise a validation error if the year is in the future
+#             raise serializers.ValidationError("Publication year cannot be in the future.")
+        
+#         return value
+
+# # --- AuthorSerializer (Includes nested Book list) ---
+# class AuthorSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer for the Author model.
+#     Includes the related 'books' for nested serialization.
+#     """
+#     # This field enables nested serialization, showing a list of all 
+#     # books related to this author when the Author is retrieved.
+#     books = BookSerializer(many=True, read_only=True) # <-- Implements the required check
+
+#     class Meta:
+#         model = Author
+#         # Ensure 'books' is included in the output fields
+#         fields = '__all__' 
+
+from rest_framework import serializers
+# Import the Book model we defined in api/models.py
+from .models import Book
+
 class BookSerializer(serializers.ModelSerializer):
     """
     Serializer for the Book model.
-    Includes custom validation to ensure the publication year is not in the future.
+    It automatically generates fields corresponding to the Book model 
+    and handles the conversion between complex data types (Book instances) 
+    and native Python data types (JSON for the API).
     """
     class Meta:
+        # The model that this serializer is based on
         model = Book
-        fields = '__all__'
-
-    def validate_year_published(self, value):
-        """
-        Custom validation to check that the publication year is not in the future.
-        """
-        current_year = datetime.date.today().year
-
-        if value > current_year:
-            # Raise a validation error if the year is in the future
-            raise serializers.ValidationError("Publication year cannot be in the future.")
         
-        return value
-
-# --- AuthorSerializer (Includes nested Book list) ---
-class AuthorSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the Author model.
-    Includes the related 'books' for nested serialization.
-    """
-    # This field enables nested serialization, showing a list of all 
-    # books related to this author when the Author is retrieved.
-    books = BookSerializer(many=True, read_only=True) # <-- Implements the required check
-
-    class Meta:
-        model = Author
-        # Ensure 'books' is included in the output fields
-        fields = '__all__' 
+        # We specify '__all__' to include all fields (title, author, published_date, isbn)
+        fields = '__all__'
+        
+        # Alternatively, you could explicitly list them:
+        # fields = ['id', 'title', 'author', 'published_date', 'isbn'] 

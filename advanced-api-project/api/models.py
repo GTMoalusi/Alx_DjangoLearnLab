@@ -130,26 +130,41 @@
 #     def __str__(self):
 #         return f"{self.title} by {self.author.name}"
 
+# from django.db import models
+
+# # Minimal model definitions required for serializers and views to work.
+# # NOTE: The ForeignKey in Book uses related_name='books', as assumed by the serializer.
+
+# class Author(models.Model):
+#     """Represents a book author."""
+#     name = models.CharField(max_length=200)
+#     bio = models.TextField(blank=True)
+#     date_of_birth = models.DateField(null=True, blank=True)
+
+#     def __str__(self):
+#         return self.name
+
+# class Book(models.Model):
+#     """Represents a published book."""
+#     title = models.CharField(max_length=255)
+#     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
+#     year_published = models.IntegerField()
+#     isbn = models.CharField(max_length=13, unique=True)
+
+#     def __str__(self):
+#         return self.title
+
 from django.db import models
 
-# Minimal model definitions required for serializers and views to work.
-# NOTE: The ForeignKey in Book uses related_name='books', as assumed by the serializer.
-
-class Author(models.Model):
-    """Represents a book author."""
-    name = models.CharField(max_length=200)
-    bio = models.TextField(blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
 class Book(models.Model):
-    """Represents a published book."""
+    """
+    Defines the Book model fields.
+    This model is necessary for the API views and serializers to work.
+    """
     title = models.CharField(max_length=255)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
-    year_published = models.IntegerField()
+    author = models.CharField(max_length=255)
+    published_date = models.DateField()
     isbn = models.CharField(max_length=13, unique=True)
-
+    
     def __str__(self):
         return self.title
