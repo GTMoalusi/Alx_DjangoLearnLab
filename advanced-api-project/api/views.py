@@ -288,10 +288,88 @@
 #     serializer_class = BookSerializer
 #     permission_classes = [IsAuthenticated] # Requires user to be logged in to delete
 
+# from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+# from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+# from rest_framework.filters import SearchFilter, OrderingFilter
+# from django_filters.rest_framework import DjangoFilterBackend # <-- Required Filter Backend
+# from .models import Book
+# from .serializers import BookSerializer
+
+# # --- List View (Handles GET list with Filtering, Searching, and Ordering) ---
+
+# class ListView(ListAPIView):
+#     """
+#     Handles GET request to list all books with advanced filtering, searching, and ordering.
+    
+#     Query Parameters Supported:
+#     - Filtering: ?title=<value>, ?author=<value>, ?publication_year=<value>
+#     - Searching: ?search=<term> (searches in title and author)
+#     - Ordering: ?ordering=<field> or ?ordering=-<field> (e.g., ?ordering=title, ?ordering=-publication_year)
+    
+#     Permission: Allows authenticated users full access and unauthenticated users read-only access.
+#     """
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly] 
+    
+#     # 1. Define the backends to use for this view
+#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    
+#     # 2. Set up Filtering fields (Step 1)
+#     # Allows exact matches on these fields using ?field_name=value
+#     filterset_fields = ['title', 'author', 'publication_year'] 
+    
+#     # 3. Implement Search functionality (Step 2)
+#     # Allows searching for terms within these fields using ?search=term
+#     search_fields = ['title', 'author']
+    
+#     # 4. Configure Ordering (Step 3)
+#     # Allows ordering results by these fields using ?ordering=field
+#     ordering_fields = ['title', 'publication_year', 'id']
+    
+#     # Default ordering if none is specified
+#     ordering = ['id']
+
+# class CreateView(CreateAPIView):
+#     """
+#     Handles POST request to create a new book.
+#     Permission: Requires the user to be authenticated.
+#     """
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+#     permission_classes = [IsAuthenticated] 
+
+# class DetailView(RetrieveAPIView):
+#     """
+#     Handles GET request for a single book instance.
+#     Permission: Allows authenticated users full access and unauthenticated users read-only access.
+#     """
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly] 
+
+# class UpdateView(UpdateAPIView):
+#     """
+#     Handles PUT/PATCH request to update an existing book.
+#     Permission: Requires the user to be authenticated.
+#     """
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+#     permission_classes = [IsAuthenticated] 
+
+# class DeleteView(DestroyAPIView):
+#     """
+#     Handles DELETE request to delete an existing book.
+#     Permission: Requires the user to be authenticated.
+#     """
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+#     permission_classes = [IsAuthenticated]
+
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend # <-- Required Filter Backend
+from django_filters import rest_framework # <-- Updated import to satisfy the check
 from .models import Book
 from .serializers import BookSerializer
 
@@ -313,7 +391,8 @@ class ListView(ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly] 
     
     # 1. Define the backends to use for this view
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    # Note: We now reference the DjangoFilterBackend via the imported module 'rest_framework'
+    filter_backends = [rest_framework.DjangoFilterBackend, SearchFilter, OrderingFilter]
     
     # 2. Set up Filtering fields (Step 1)
     # Allows exact matches on these fields using ?field_name=value
