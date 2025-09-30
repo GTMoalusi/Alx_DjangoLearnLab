@@ -33,19 +33,31 @@ Including another URLconf
 # ]
 
 # project_tracker/urls.py
+# from django.contrib import admin
+# from django.urls import path, include
+
+# urlpatterns = [
+#     # Standard Django Admin interface
+#     path('admin/', admin.site.urls),
+    
+#     # API Endpoints
+#     # All URLs defined in api/urls.py will be prefixed with 'api/'
+#     # This means your main endpoints are now: /api/items/ and /api/items/<id>/
+#     path('api/', include('api.urls')),
+    
+#     # Optional: Includes the login/logout views for the browsable API
+#     # This is useful for testing in your browser
+#     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+# ]
+
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    # Standard Django Admin interface
+    # Default path for the Django Admin interface
     path('admin/', admin.site.urls),
-    
-    # API Endpoints
-    # All URLs defined in api/urls.py will be prefixed with 'api/'
-    # This means your main endpoints are now: /api/items/ and /api/items/<id>/
+
+    # MANDATORY: Include the 'api' application's URLs under the base path 'api/'
+    # This directs all requests starting with '/api/' to your api/urls.py file.
     path('api/', include('api.urls')),
-    
-    # Optional: Includes the login/logout views for the browsable API
-    # This is useful for testing in your browser
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

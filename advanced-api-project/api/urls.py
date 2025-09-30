@@ -17,23 +17,39 @@
 #     path('items/<int:pk>/', ProjectItemRetrieveUpdateDestroy.as_view(), name='item-detail'),
 # ]
 
+# from django.urls import path
+# from .views import (
+#     BookListCreateAPIView, 
+#     BookRetrieveUpdateDestroyAPIView
+# )
+
+# # Define the URL patterns for the API
+# urlpatterns = [
+#     # 1. Endpoint for listing all books and creating a new book
+#     # URL: /api/books/
+#     path('books/', 
+#          BookListCreateAPIView.as_view(), 
+#          name='book-list-create'),
+
+#     # 2. Endpoint for retrieving, updating, or deleting a single book
+#     # URL: /api/books/<pk>/ (e.g., /api/books/1/)
+#     path('books/<int:pk>/', 
+#          BookRetrieveUpdateDestroyAPIView.as_view(), 
+#          name='book-detail'),
+# ]
+
 from django.urls import path
-from .views import (
-    BookListCreateAPIView, 
-    BookRetrieveUpdateDestroyAPIView
-)
+from . import views
 
-# Define the URL patterns for the API
 urlpatterns = [
-    # 1. Endpoint for listing all books and creating a new book
-    # URL: /api/books/
-    path('books/', 
-         BookListCreateAPIView.as_view(), 
-         name='book-list-create'),
+    # Paths for listing all books (GET) and creating a new book (POST)
+    # Both List and Create use the same path but are separated by HTTP method in views.py
+    path('books/', views.ListView.as_view(), name='book-list'),
+    path('books/', views.CreateView.as_view(), name='book-create'),
 
-    # 2. Endpoint for retrieving, updating, or deleting a single book
-    # URL: /api/books/<pk>/ (e.g., /api/books/1/)
-    path('books/<int:pk>/', 
-         BookRetrieveUpdateDestroyAPIView.as_view(), 
-         name='book-detail'),
+    # Paths for detailed operations on a single book, requiring the primary key (pk)
+    # Detail (GET), Update (PUT/PATCH), and Delete (DELETE)
+    path('books/<int:pk>/', views.DetailView.as_view(), name='book-detail'),
+    path('books/<int:pk>/', views.UpdateView.as_view(), name='book-update'),
+    path('books/<int:pk>/', views.DeleteView.as_view(), name='book-delete'),
 ]
