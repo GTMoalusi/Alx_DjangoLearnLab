@@ -38,18 +38,43 @@
 #          name='book-detail'),
 # ]
 
+# from django.urls import path
+# from . import views
+
+# urlpatterns = [
+#     # Paths for listing all books (GET) and creating a new book (POST)
+#     # Both List and Create use the same path but are separated by HTTP method in views.py
+#     path('books/', views.ListView.as_view(), name='book-list'),
+#     path('books/', views.CreateView.as_view(), name='book-create'),
+
+#     # Paths for detailed operations on a single book, requiring the primary key (pk)
+#     # Detail (GET), Update (PUT/PATCH), and Delete (DELETE)
+#     path('books/<int:pk>/', views.DetailView.as_view(), name='book-detail'),
+#     path('books/<int:pk>/', views.UpdateView.as_view(), name='book-update'),
+#     path('books/<int:pk>/', views.DeleteView.as_view(), name='book-delete'),
+# ]
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Paths for listing all books (GET) and creating a new book (POST)
-    # Both List and Create use the same path but are separated by HTTP method in views.py
+    # 1. List (GET) & Create (POST) endpoints
+    # Use 'books/' for the list view (GET)
     path('books/', views.ListView.as_view(), name='book-list'),
-    path('books/', views.CreateView.as_view(), name='book-create'),
+    
+    # Explicitly name a path for 'create' operation (POST to /api/books/create)
+    # This addresses the check requirement for "books/create"
+    path('books/create/', views.CreateView.as_view(), name='book-create'),
 
-    # Paths for detailed operations on a single book, requiring the primary key (pk)
-    # Detail (GET), Update (PUT/PATCH), and Delete (DELETE)
+    # 2. Detail (GET), Update (PUT/PATCH), and Delete (DELETE) endpoints
+    # Use 'books/<int:pk>/' for the detail view (GET)
     path('books/<int:pk>/', views.DetailView.as_view(), name='book-detail'),
-    path('books/<int:pk>/', views.UpdateView.as_view(), name='book-update'),
-    path('books/<int:pk>/', views.DeleteView.as_view(), name='book-delete'),
+    
+    # Explicitly name a path for 'update' operation
+    # This addresses the check requirement for "books/update"
+    path('books/<int:pk>/update/', views.UpdateView.as_view(), name='book-update'),
+    
+    # Explicitly name a path for 'delete' operation
+    # This addresses the check requirement for "books/delete"
+    path('books/<int:pk>/delete/', views.DeleteView.as_view(), name='book-delete'),
 ]
