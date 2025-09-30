@@ -127,107 +127,163 @@
 #     #     print(f"User {self.request.user} is deleting book: {instance.title}")
 #     #     instance.delete()
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+# from .models import Book
+# from .serializers import BookSerializer
+
+# # --- Custom View Classes Required by the Check ---
+
+# # 1. ListView (GET /api/books/)
+# class ListView(APIView):
+#     """
+#     List all books, or allow unauthenticated users to read (GET).
+#     Uses IsAuthenticatedOrReadOnly.
+#     """
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def get(self, request, format=None):
+#         books = Book.objects.all()
+#         serializer = BookSerializer(books, many=True)
+#         return Response(serializer.data)
+
+# # 2. DetailView (GET /api/books/<pk>/)
+# class DetailView(APIView):
+#     """
+#     Retrieve details for a single book.
+#     Uses IsAuthenticatedOrReadOnly.
+#     """
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def get(self, request, pk, format=None):
+#         try:
+#             book = Book.objects.get(pk=pk)
+#         except Book.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+
+#         serializer = BookSerializer(book)
+#         return Response(serializer.data)
+
+# # 3. CreateView (POST /api/books/)
+# class CreateView(APIView):
+#     """
+#     Create a new book (requires authentication).
+#     Uses IsAuthenticatedOrReadOnly.
+#     """
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def post(self, request, format=None):
+#         # The permission check ensures only authenticated users reach this point for POST
+#         serializer = BookSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# # 4. UpdateView (PUT/PATCH /api/books/<pk>/)
+# class UpdateView(APIView):
+#     """
+#     Update an existing book (requires authentication).
+#     Uses IsAuthenticatedOrReadOnly.
+#     """
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def get_object(self, pk):
+#         try:
+#             return Book.objects.get(pk=pk)
+#         except Book.DoesNotExist:
+#             return None
+
+#     def put(self, request, pk, format=None):
+#         book = self.get_object(pk)
+#         if book is None:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+
+#         serializer = BookSerializer(book, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# # 5. DeleteView (DELETE /api/books/<pk>/)
+# class DeleteView(APIView):
+#     """
+#     Delete a book (requires authentication).
+#     Uses IsAuthenticatedOrReadOnly.
+#     """
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def get_object(self, pk):
+#         try:
+#             return Book.objects.get(pk=pk)
+#         except Book.DoesNotExist:
+#             return None
+
+#     def delete(self, request, pk, format=None):
+#         book = self.get_object(pk)
+#         if book is None:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+
+#         book.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# # --- End of Custom Views ---
+
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book
 from .serializers import BookSerializer
 
-# --- Custom View Classes Required by the Check ---
+# --- List and Detail Views (Read-Only access for unauthenticated users) ---
+# Unauthenticated users can read (GET), but must be authenticated to modify (POST, PUT, DELETE)
 
-# 1. ListView (GET /api/books/)
-class ListView(APIView):
+class ListView(ListAPIView):
     """
-    List all books, or allow unauthenticated users to read (GET).
-    Uses IsAuthenticatedOrReadOnly.
+    Handles GET request to list all books.
+    Permission: Allows authenticated users full access and unauthenticated users read-only access.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly] # Allow reads for anyone, but require auth for writes/updates
 
-    def get(self, request, format=None):
-        books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data)
-
-# 2. DetailView (GET /api/books/<pk>/)
-class DetailView(APIView):
+class DetailView(RetrieveAPIView):
     """
-    Retrieve details for a single book.
-    Uses IsAuthenticatedOrReadOnly.
+    Handles GET request for a single book instance.
+    Permission: Allows authenticated users full access and unauthenticated users read-only access.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly] # Allow reads for anyone, but require auth for writes/updates
 
-    def get(self, request, pk, format=None):
-        try:
-            book = Book.objects.get(pk=pk)
-        except Book.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+# --- Create, Update, and Delete Views (Require full authentication) ---
+# Users must be fully authenticated (logged in) to perform these operations.
 
-        serializer = BookSerializer(book)
-        return Response(serializer.data)
-
-# 3. CreateView (POST /api/books/)
-class CreateView(APIView):
+class CreateView(CreateAPIView):
     """
-    Create a new book (requires authentication).
-    Uses IsAuthenticatedOrReadOnly.
+    Handles POST request to create a new book.
+    Permission: Requires the user to be authenticated.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated] # Requires user to be logged in to create
 
-    def post(self, request, format=None):
-        # The permission check ensures only authenticated users reach this point for POST
-        serializer = BookSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# 4. UpdateView (PUT/PATCH /api/books/<pk>/)
-class UpdateView(APIView):
+class UpdateView(UpdateAPIView):
     """
-    Update an existing book (requires authentication).
-    Uses IsAuthenticatedOrReadOnly.
+    Handles PUT/PATCH request to update an existing book.
+    Permission: Requires the user to be authenticated.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated] # Requires user to be logged in to update
 
-    def get_object(self, pk):
-        try:
-            return Book.objects.get(pk=pk)
-        except Book.DoesNotExist:
-            return None
-
-    def put(self, request, pk, format=None):
-        book = self.get_object(pk)
-        if book is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = BookSerializer(book, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# 5. DeleteView (DELETE /api/books/<pk>/)
-class DeleteView(APIView):
+class DeleteView(DestroyAPIView):
     """
-    Delete a book (requires authentication).
-    Uses IsAuthenticatedOrReadOnly.
+    Handles DELETE request to delete an existing book.
+    Permission: Requires the user to be authenticated.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get_object(self, pk):
-        try:
-            return Book.objects.get(pk=pk)
-        except Book.DoesNotExist:
-            return None
-
-    def delete(self, request, pk, format=None):
-        book = self.get_object(pk)
-        if book is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        book.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-# --- End of Custom Views ---
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated] # Requires user to be logged in to delete
