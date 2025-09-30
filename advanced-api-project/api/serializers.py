@@ -129,13 +129,59 @@
 #         model = Author
 #         fields = '__all__'
 
-from rest_framework import serializers
-from .models import Author, Book # Make sure these imports match your models
+# from rest_framework import serializers
+# from .models import Author, Book # Make sure these imports match your models
 
-# --- BookSerializer (for use in AuthorSerializer and for Book detail) ---
+# # --- BookSerializer (for use in AuthorSerializer and for Book detail) ---
+# class BookSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer for the Book model, including validation.
+#     """
+#     class Meta:
+#         model = Book
+#         fields = '__all__'
+
+#     def validate_year_published(self, value):
+#         """
+#         Custom validation to check that the publication year is not in the future.
+#         (Kept from the previous fix for ValidationError)
+#         """
+#         import datetime
+#         current_year = datetime.date.today().year
+
+#         if value > current_year:
+#             raise serializers.ValidationError("Publication year cannot be in the future.")
+        
+#         return value
+
+# # --- AuthorSerializer (with Nested Books) ---
+# class AuthorSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer for the Author model. Includes nested serialization of related Books.
+#     """
+#     # This nested field fetches all related Book objects (many=True) and
+#     # makes them read-only on the Author endpoint.
+#     # NOTE: 'books' is used as the field name. This assumes your ForeignKey 
+#     # in the Book model uses related_name='books'. If you didn't specify 
+#     # a related_name, the field should be named 'book_set'.
+#     books = BookSerializer(many=True, read_only=True) # <-- The required line
+
+#     class Meta:
+#         model = Author
+#         # Ensure 'books' is included in the fields list, or just use '__all__'
+#         fields = '__all__'
+#         # Example if you only wanted specific fields:
+#         # fields = ['id', 'name', 'books'] 
+
+from rest_framework import serializers
+from .models import Author, Book 
+import datetime
+
+# --- BookSerializer (Used as a standalone serializer and nested inside AuthorSerializer) ---
 class BookSerializer(serializers.ModelSerializer):
     """
-    Serializer for the Book model, including validation.
+    Serializer for the Book model.
+    Includes custom validation to ensure the publication year is not in the future.
     """
     class Meta:
         model = Book
@@ -144,31 +190,26 @@ class BookSerializer(serializers.ModelSerializer):
     def validate_year_published(self, value):
         """
         Custom validation to check that the publication year is not in the future.
-        (Kept from the previous fix for ValidationError)
         """
-        import datetime
         current_year = datetime.date.today().year
 
         if value > current_year:
+            # Raise a validation error if the year is in the future
             raise serializers.ValidationError("Publication year cannot be in the future.")
         
         return value
 
-# --- AuthorSerializer (with Nested Books) ---
+# --- AuthorSerializer (Includes nested Book list) ---
 class AuthorSerializer(serializers.ModelSerializer):
     """
-    Serializer for the Author model. Includes nested serialization of related Books.
+    Serializer for the Author model.
+    Includes the related 'books' for nested serialization.
     """
-    # This nested field fetches all related Book objects (many=True) and
-    # makes them read-only on the Author endpoint.
-    # NOTE: 'books' is used as the field name. This assumes your ForeignKey 
-    # in the Book model uses related_name='books'. If you didn't specify 
-    # a related_name, the field should be named 'book_set'.
-    books = BookSerializer(many=True, read_only=True) # <-- The required line
+    # This field enables nested serialization, showing a list of all 
+    # books related to this author when the Author is retrieved.
+    books = BookSerializer(many=True, read_only=True) # <-- Implements the required check
 
     class Meta:
         model = Author
-        # Ensure 'books' is included in the fields list, or just use '__all__'
-        fields = '__all__'
-        # Example if you only wanted specific fields:
-        # fields = ['id', 'name', 'books'] 
+        # Ensure 'books' is included in the output fields
+        fields = '__all__' 
