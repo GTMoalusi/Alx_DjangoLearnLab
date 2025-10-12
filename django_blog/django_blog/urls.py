@@ -18,6 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    # Admin site URL
     path('admin/', admin.site.urls),
-    path('', include('blog.urls')), # Directs the base URL (http://127.0.0.1:8000/) to the 'blog' app URLs
+
+    # Include the blog application's URLs at the root of the project.
+    # This is necessary for Django to find the 'home' and 'posts' names.
+    path('', include('blog.urls')),
+
+    # This makes 'login' and 'logout' (and others) available under the 'accounts/' path.
+    path('accounts/', include('django.contrib.auth.urls')), 
+
 ]
+
+
+    
+
