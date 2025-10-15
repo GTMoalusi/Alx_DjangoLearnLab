@@ -14,6 +14,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# from django.contrib import admin
+# from django.urls import path, include
+
+# urlpatterns = [
+#     # Admin path remains the same
+#     path('admin/', admin.site.urls),
+    
+#     # NEW: Include the blog application's URLs.
+#     # We map the root path ('') to the blog app and specify a namespace 'blog'.
+#     # This allows template tags like {% url 'blog:home' %} to work.
+#     path('', include('blog.urls')),
+    
+#     # You might also need this line if you are handling authentication (login/logout) 
+#     # outside of the blog app, which is a common practice.
+#     # path('accounts/', include('django.contrib.auth.urls')),
+# ]
+
 from django.contrib import admin
 from django.urls import path, include
 
@@ -21,12 +38,10 @@ urlpatterns = [
     # Admin path remains the same
     path('admin/', admin.site.urls),
     
-    # NEW: Include the blog application's URLs.
-    # We map the root path ('') to the blog app and specify a namespace 'blog'.
-    # This allows template tags like {% url 'blog:home' %} to work.
+    # NEW: Include the blog application's URLs at the root path ('').
+    # Since blog.urls defines 'home', 'posts', and 'register', they are now accessible.
     path('', include('blog.urls')),
     
-    # You might also need this line if you are handling authentication (login/logout) 
-    # outside of the blog app, which is a common practice.
-    path('accounts/', include('django.contrib.auth.urls')),
+    # This path is generally needed if you plan to use Django's built-in login views
+    # path('accounts/', include('django.contrib.auth.urls')),
 ]
