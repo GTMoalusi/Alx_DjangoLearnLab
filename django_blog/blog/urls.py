@@ -67,40 +67,63 @@
 #          name='password_reset_complete'),
 # ]
 
+# from django.urls import path
+# from . import views
+# from .views import (
+#     PostListView,
+#     PostDetailView,
+#     PostCreateView,
+#     PostUpdateView,
+#     PostDeleteView
+# )
+
+# # Mandatory for namespacing
+# app_name = 'blog'
+
+# urlpatterns = [
+#     # Home/Index page (using the function-based view from blog/views.py)
+#     path('home/', views.index, name='index'),
+
+#     # READ: List all posts
+#     # URL: /blog/
+#     path('', PostListView.as_view(), name='post_list'),
+
+#     # READ: Detail view for a single post
+#     # URL: /blog/post/12/
+#     path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
+
+#     # CREATE: View to create a new post
+#     # URL: /blog/post/new/
+#     path('post/new/', PostCreateView.as_view(), name='post_create'),
+
+#     # UPDATE: View to edit an existing post (requires primary key)
+#     # URL: /blog/post/12/edit/
+#     path('post/<int:pk>/edit/', PostUpdateView.as_view(), name='post_edit'),
+
+#     # DELETE: View to delete an existing post (requires primary key)
+#     # URL: /blog/post/12/delete/
+#     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
+# ]
+
 from django.urls import path
 from . import views
-from .views import (
-    PostListView,
-    PostDetailView,
-    PostCreateView,
-    PostUpdateView,
-    PostDeleteView
-)
 
-# Mandatory for namespacing
 app_name = 'blog'
 
 urlpatterns = [
-    # Home/Index page (using the function-based view from blog/views.py)
-    path('home/', views.index, name='index'),
+    # READ: Post List View (All posts)
+    path('', views.PostListView.as_view(), name='post_list'),
+    
+    # READ: Post Detail View (Single post)
+    path('post/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
+    
+    # CREATE: Create Post View
+    path('post/new/', views.PostCreateView.as_view(), name='post_create'),
 
-    # READ: List all posts
-    # URL: /blog/
-    path('', PostListView.as_view(), name='post_list'),
-
-    # READ: Detail view for a single post
-    # URL: /blog/post/12/
-    path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
-
-    # CREATE: View to create a new post
-    # URL: /blog/post/new/
-    path('post/new/', PostCreateView.as_view(), name='post_create'),
-
-    # UPDATE: View to edit an existing post (requires primary key)
-    # URL: /blog/post/12/edit/
-    path('post/<int:pk>/edit/', PostUpdateView.as_view(), name='post_edit'),
-
-    # DELETE: View to delete an existing post (requires primary key)
-    # URL: /blog/post/12/delete/
-    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
+    # UPDATE: Edit Post View (Corrected to use '/update/')
+    # This URL pattern is now: post/<int:pk>/update/
+    path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post_update'),
+    
+    # DELETE: Delete Post View
+    path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
 ]
