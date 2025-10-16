@@ -1,0 +1,168 @@
+{% extends 'blog/base.html' %} {% load static %} {% block title %}{{
+user.username }}'s Profile{% endblock %} {% block content %}
+<div
+  class="flex flex-col items-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-10"
+>
+  <div
+    class="w-full max-w-2xl p-8 space-y-8 bg-white rounded-xl shadow-2xl dark:bg-gray-800 transition-all duration-300 transform"
+  >
+    <div class="text-center border-b pb-4 dark:border-gray-700">
+      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+        Your Profile
+      </h1>
+      <p class="text-lg text-indigo-600 dark:text-indigo-400">
+        Manage your account details and profile picture.
+      </p>
+    </div>
+
+    <!-- Success Message Area -->
+    {% if messages %}
+    <div class="space-y-3">
+      {% for message in messages %}
+      <div
+        class="p-3 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800"
+        role="alert"
+      >
+        <p class="font-medium">{{ message }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+      {% csrf_token %}
+
+      <!-- Profile Picture Section -->
+      <div class="flex flex-col items-center space-y-4">
+        <!-- 
+                    FIX: We cannot use {% static ... %} directly inside onerror='...'.
+                    We must generate the URL and store it in a custom attribute (data-default-url) or a variable.
+                    The simplest fix is to use a hidden element to hold the static URL.
+                -->
+        <input
+          type="hidden"
+          id="defaultProfileUrl"
+          value="{% static 'blog/default_profile.png' %}"
+        />
+
+        <img
+          class="w-32 h-32 object-cover rounded-full border-4 border-indigo-500 shadow-lg"
+          src="{{ user.profile.image.url }}"
+          alt="{{ user.username }}'s Profile Picture"
+          onerror="this.onerror=null; this.src=document.getElementById('defaultProfileUrl').value;"
+        />
+
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">
+          @{{ user.username }}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400">{{ user.email }}</p>
+      </div>
+
+      <!-- Profile Form (p_form) - Handles Profile Image and Bio -->
+      <div class="pt-4 border-t dark:border-gray-700 space-y-6">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+          Profile Details
+        </h3>
+
+        {% for field in p_form %}
+        <div>
+          <label
+            for="{{ field.id_for_label }}"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            {{ field.label }}
+          </label>
+          {{ field }} {% if field.help_text %}
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {{ field.help_text|safe }}
+          </p>
+          {% endif %} {% for error in field.errors %}
+          <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- User Form (u_form) - Handles Username, Email, First/Last Name -->
+      <div class="pt-4 border-t dark:border-gray-700 space-y-6">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+          Account Information
+        </h3>
+
+        {% for field in u_form %}
+        <div>
+          <label
+            for="{{ field.id_for_label }}"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            {{ field.label }}
+          </label>
+          {{ field }} {% if field.help_text %}
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {{ field.help_text|safe }}
+          </p>
+          {% endif %} {% for error in field.errors %}
+          <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <button
+        type="submit"
+        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+      >
+        Update Profile
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* Global style for Django form inputs, ensuring consistency */
+  .form-control,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.5rem; /* rounded-lg */
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #111827; /* gray-900 */
+    background-color: #ffffff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    /* Apply basic file input styling reset */
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .dark .form-control,
+  .dark input[type="text"],
+  .dark input[type="email"],
+  .dark input[type="password"],
+  .dark textarea,
+  .dark input[type="file"] {
+    color: #e5e7eb; /* gray-200 */
+    background-color: #1f2937; /* gray-700 */
+    border-color: #374151; /* gray-600 */
+  }
+  .form-control:focus,
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  textarea:focus {
+    border-color: #4f46e5; /* indigo-600 */
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* indigo-500 with opacity */
+  }
+  /* Specific styling for the file input to make it look nicer */
+  input[type="file"] {
+    @apply cursor-pointer;
+    padding: 0.25rem 0.75rem; /* Adjust padding for file input */
+  }
+</style>
+{% endblock content %}

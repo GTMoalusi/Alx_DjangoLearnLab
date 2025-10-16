@@ -1,0 +1,116 @@
+{% extends 'blog/base.html' %} {% load static %} {% block title %}Log In{%
+endblock %} {% block content %}
+<div
+  class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4"
+>
+  <div
+    class="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-2xl dark:bg-gray-800 transition-all duration-300 transform hover:shadow-3xl"
+  >
+    <div class="text-center">
+      <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
+        Welcome Back!
+      </h1>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Sign in to manage your posts and profile.
+      </p>
+    </div>
+
+    <!-- Display non-field errors (like 'Invalid credentials') -->
+    {% if form.non_field_errors %}
+    <div
+      class="p-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800"
+      role="alert"
+    >
+      {% for error in form.non_field_errors %}
+      <p class="font-medium">{{ error }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Loop through visible fields (username and password) -->
+      {% for field in form.visible_fields %}
+      <div>
+        <label
+          for="{{ field.id_for_label }}"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          {{ field.label }}
+        </label>
+        {{ field }} {% for error in field.errors %}
+        <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endfor %}
+
+      <!-- Include hidden fields (like next URL) -->
+      {% for hidden in form.hidden_fields %} {{ hidden }} {% endfor %}
+
+      <div class="flex items-center justify-between">
+        <div class="text-sm">
+          <a
+            href="{% url 'blog:password_reset' %}"
+            class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+          >
+            Forgot your password?
+          </a>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+      >
+        Log In
+      </button>
+    </form>
+
+    <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+      Don't have an account?
+      <a
+        href="{% url 'blog:register' %}"
+        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+      >
+        Register here
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Styling for Django Form Fields to apply Tailwind classes */
+  .form-control,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.5rem; /* rounded-lg */
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #111827; /* gray-900 */
+    background-color: #ffffff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  .dark .form-control,
+  .dark input[type="text"],
+  .dark input[type="email"],
+  .dark input[type="password"] {
+    color: #e5e7eb; /* gray-200 */
+    background-color: #1f2937; /* gray-700 */
+    border-color: #374151; /* gray-600 */
+  }
+  .form-control:focus,
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: #4f46e5; /* indigo-600 */
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* indigo-500 with opacity */
+  }
+</style>
+{% endblock content %}
