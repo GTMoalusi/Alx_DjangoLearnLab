@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4 py-12 max-w-lg">
+  <div class="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-500">
+    <h1
+      class="text-3xl font-bold text-red-700 mb-6 border-b border-red-200 pb-3"
+    >
+      Confirm Deletion
+    </h1>
+
+    <p class="text-gray-700 mb-6">
+      Are you absolutely sure you want to **delete** your comment? This action
+      cannot be undone.
+    </p>
+
+    <!-- Display the content of the comment being deleted -->
+    <div class="mb-8 p-4 bg-gray-100 rounded-lg border border-gray-300">
+      <p class="font-semibold text-gray-800 mb-2">
+        Comment by {{ comment.author.username }}:
+      </p>
+      <p class="text-gray-600 italic">"{{ comment.text|truncatechars:100 }}"</p>
+      <p class="text-xs text-gray-400 mt-2">
+        Posted on: {{ comment.created_at|date:"M d, Y" }}
+      </p>
+    </div>
+
+    <form method="POST" class="space-y-4">
+      {% csrf_token %}
+
+      <div class="flex items-center justify-between">
+        <!-- Confirmation Button (Destructive action, red) -->
+        <button
+          type="submit"
+          class="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-150 font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+        >
+          Yes, Delete this Comment
+        </button>
+
+        <!-- Cancel Link (Non-destructive action, secondary style) -->
+        <a
+          href="{% url 'blog:post_detail' comment.post.slug %}"
+          class="text-gray-600 bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition duration-150 font-semibold"
+        >
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

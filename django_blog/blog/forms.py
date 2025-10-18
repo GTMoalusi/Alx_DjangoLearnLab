@@ -58,36 +58,70 @@
 #             user.save()
 #         return user
 
-from django import forms
-from .models import Post
-from django.contrib.auth.forms import UserCreationForm
+# from django import forms
+# from .models import Post
+# from django.contrib.auth.forms import UserCreationForm
 
-# Placeholder: Keep your existing custom user creation form if you have one.
-class CustomUserCreationForm(UserCreationForm):
-    """
-    If you are using a custom user model or wanted to add extra fields
-    to the registration form, it would live here.
-    """
-    # Example: If you have extra fields, define them here.
-    # No changes are needed here for the Post CRUD.
+# # Placeholder: Keep your existing custom user creation form if you have one.
+# class CustomUserCreationForm(UserCreationForm):
+#     """
+#     If you are using a custom user model or wanted to add extra fields
+#     to the registration form, it would live here.
+#     """
+#     # Example: If you have extra fields, define them here.
+#     # No changes are needed here for the Post CRUD.
+#     pass
+
+# # --- NEW: Form for creating and updating blog posts ---
+# class PostForm(forms.ModelForm):
+#     """
+#     A ModelForm for the Post model. This form is used for both PostCreateView 
+#     and PostUpdateView.
+
+#     It only includes 'title' and 'content', as the 'author' and 'published_date'
+#     fields are set automatically in the view (views.py).
+#     """
+#     class Meta:
+#         model = Post
+#         # Define the fields the user will interact with
+#         fields = ['title', 'content']
+        
+#         # Add widgets for better display in the HTML
+#         widgets = {
+#             'title': forms.TextInput(attrs={'placeholder': 'Enter a catchy title...'}),
+#             'content': forms.Textarea(attrs={'rows': 15, 'placeholder': 'Write your blog content here...'}),
+#         }
+
+from django import forms
+from .models import Post, Comment # Ensure Post is imported if other forms use it, and we definitely need Comment
+
+# --- Placeholder/Existing Form (If you have a CustomUserCreationForm, replace this) ---
+# NOTE: If you already have other forms in this file, make sure to merge them.
+# I'm including a placeholder for completeness.
+class CustomUserCreationForm(forms.Form): 
+    # This form should typically handle user registration fields like username, password, etc.
+    # Leaving it simple here as the focus is on CommentForm.
     pass
 
-# --- NEW: Form for creating and updating blog posts ---
-class PostForm(forms.ModelForm):
-    """
-    A ModelForm for the Post model. This form is used for both PostCreateView 
-    and PostUpdateView.
 
-    It only includes 'title' and 'content', as the 'author' and 'published_date'
-    fields are set automatically in the view (views.py).
+# --- New Comment Form ---
+class CommentForm(forms.ModelForm):
     """
+    A ModelForm for the Comment model. 
+    It only exposes the 'content' field to the user.
+    """
+    # Customize the content field to use a TextArea with placeholder text
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 4, # Make the input box slightly larger
+            'placeholder': 'Join the discussion... write your comment here.',
+            'class': 'w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500',
+        }), 
+        label='Your Comment'
+    )
+    
     class Meta:
-        model = Post
-        # Define the fields the user will interact with
-        fields = ['title', 'content']
-        
-        # Add widgets for better display in the HTML
-        widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Enter a catchy title...'}),
-            'content': forms.Textarea(attrs={'rows': 15, 'placeholder': 'Write your blog content here...'}),
-        }
+        model = Comment
+        # The user only needs to input the 'content'.
+        # 'post', 'author', 'created_at', and 'updated_at' are handled in the view.
+        fields = ('content',)

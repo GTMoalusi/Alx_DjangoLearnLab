@@ -105,25 +105,53 @@
 #     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
 # ]
 
-from django.urls import path
-from . import views
+# from django.urls import path
+# from . import views
 
+# app_name = 'blog'
+
+# urlpatterns = [
+#     # READ: Post List View (All posts)
+#     path('', views.PostListView.as_view(), name='post_list'),
+    
+#     # READ: Post Detail View (Single post)
+#     path('post/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
+    
+#     # CREATE: Create Post View
+#     path('post/new/', views.PostCreateView.as_view(), name='post_create'),
+
+#     # UPDATE: Edit Post View (Corrected to use '/update/')
+#     # This URL pattern is now: post/<int:pk>/update/
+#     path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post_update'),
+    
+#     # DELETE: Delete Post View
+#     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
+# ]
+
+from django.urls import path
+from .views import (
+    PostListView,
+    PostDetailView,
+    PostCreateView,
+    PostUpdateView,
+    PostDeleteView,
+    CommentUpdateView,  # Import the new views
+    CommentDeleteView,  # Import the new views
+)
+
+# Define the application namespace
 app_name = 'blog'
 
 urlpatterns = [
-    # READ: Post List View (All posts)
-    path('', views.PostListView.as_view(), name='post_list'),
+    # Post URLs
+    path('', PostListView.as_view(), name='post_list'),
+    path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
+    path('new/', PostCreateView.as_view(), name='post_create'),
+    path('<slug:slug>/edit/', PostUpdateView.as_view(), name='post_update'),
+    path('<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),
     
-    # READ: Post Detail View (Single post)
-    path('post/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
-    
-    # CREATE: Create Post View
-    path('post/new/', views.PostCreateView.as_view(), name='post_create'),
-
-    # UPDATE: Edit Post View (Corrected to use '/update/')
-    # This URL pattern is now: post/<int:pk>/update/
-    path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post_update'),
-    
-    # DELETE: Delete Post View
-    path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
+    # Comment URLs
+    # We use <int:pk> here because the primary key refers to the Comment model itself
+    path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 ]

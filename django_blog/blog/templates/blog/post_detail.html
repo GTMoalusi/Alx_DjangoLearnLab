@@ -1,4 +1,4 @@
-{% extends "blog/base.html" %} {% load static %} {% block content %}
+<!-- {% extends "blog/base.html" %} {% load static %} {% block content %}
 <div class="container mx-auto p-4 max-w-4xl">
   <article class="bg-white p-8 rounded-xl shadow-2xl">
     <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ post.title }}</h1>
@@ -38,5 +38,132 @@
       >
     </div>
   </article>
+</div>
+{% endblock content %} -->
+
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <!-- POST CONTENT SECTION -->
+  <article class="bg-white p-8 rounded-xl shadow-lg mb-10">
+    <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ post.title }}</h1>
+    <div class="text-sm text-gray-500 mb-6 border-b pb-4">
+      By
+      <span class="font-semibold text-indigo-600"
+        >{{ post.author.username }}</span
+      >
+      on {{ post.created_at|date:"F d, Y" }} {% if user.is_authenticated and
+      user == post.author %}
+      <span class="ml-4 text-xs">
+        <a
+          href="{% url 'blog:post_update' post.slug %}"
+          class="text-blue-500 hover:text-blue-700 font-medium"
+          >Edit Post</a
+        >
+        |
+        <a
+          href="{% url 'blog:post_delete' post.slug %}"
+          class="text-red-500 hover:text-red-700 font-medium"
+          >Delete Post</a
+        >
+      </span>
+      {% endif %}
+    </div>
+
+    <div class="prose max-w-none text-gray-700 leading-relaxed">
+      {{ post.content|linebreaks }}
+    </div>
+  </article>
+
+  <!-- COMMENTS SECTION -->
+  <div class="bg-gray-50 p-6 rounded-xl shadow-inner">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+      {{ post.comments.count }} Comment{{ post.comments.count|pluralize }}
+    </h2>
+
+    <!-- EXISTING COMMENTS LIST -->
+    <div id="comments-list" class="space-y-6">
+      {% for comment in post.comments.all|dictsort:"created_at" %}
+      <div class="p-4 bg-white rounded-lg border border-gray-200">
+        <div class="flex justify-between items-start mb-2">
+          <p class="font-semibold text-gray-800">
+            {{ comment.author.username }}
+          </p>
+          <div class="text-xs text-gray-400 flex items-center">
+            <span class="mr-2">{{ comment.created_at|date:"M d, H:i" }}</span>
+
+            <!-- COMMENT ACTION BUTTONS (Only shown to author) -->
+            {% if user.is_authenticated and user == comment.author %}
+            <a
+              href="{% url 'blog:comment_update' comment.pk %}"
+              class="text-xs text-indigo-500 hover:text-indigo-700 font-medium ml-2"
+              >Edit</a
+            >
+            <span class="text-gray-300 mx-1">|</span>
+            <a
+              href="{% url 'blog:comment_delete' comment.pk %}"
+              class="text-xs text-red-500 hover:text-red-700 font-medium"
+              >Delete</a
+            >
+            {% endif %}
+          </div>
+        </div>
+        <p class="text-gray-600">{{ comment.text|linebreaksbr }}</p>
+      </div>
+      {% empty %}
+      <p class="text-gray-500 italic">Be the first to leave a comment!</p>
+      {% endfor %}
+    </div>
+
+    <hr class="my-8 border-gray-300" />
+
+    <!-- NEW COMMENT FORM -->
+    <div id="comment-form-section">
+      {% if user.is_authenticated %}
+      <h3 class="text-xl font-bold text-gray-800 mb-4">Leave a Comment</h3>
+      <form
+        method="POST"
+        action="{% url 'blog:post_detail' post.slug %}"
+        class="space-y-4"
+      >
+        {% csrf_token %}
+
+        <!-- Displaying Form Errors (optional, but good practice) -->
+        {% if form.errors %}
+        <div
+          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <strong class="font-bold">Error submitting comment:</strong>
+          <ul class="mt-2 list-disc list-inside">
+            {% for field, errors in form.errors.items %} {% for error in errors
+            %}
+            <li>{{ field|title }}: {{ error }}</li>
+            {% endfor %} {% endfor %}
+          </ul>
+        </div>
+        {% endif %} {{ form.as_p }}
+
+        <button
+          type="submit"
+          class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition duration-150 font-semibold shadow-md"
+        >
+          Post Comment
+        </button>
+      </form>
+      {% else %}
+      <!-- Message for unauthenticated users -->
+      <p
+        class="text-center text-gray-600 p-4 border border-indigo-200 bg-indigo-50 rounded-lg"
+      >
+        <a
+          href="{% url 'login' %}?next={{ request.path }}"
+          class="text-indigo-600 hover:text-indigo-800 font-bold"
+          >Log in</a
+        >
+        to post a comment.
+      </p>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock content %}
