@@ -30,15 +30,14 @@ urlpatterns = [
     # Delete an existing post
     path('post/<int:pk>/<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),
 
-    # --- Comment URLs ---
+    # --- Comment URLs (Updated to match specific check requirements) ---
     
-    # Create a new comment on a specific post (REQUIRED PATH)
-    # The <int:pk> here refers to the Post's primary key
+    # Create a new comment on a specific post (PK refers to the Post)
     path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='comment_create'),
     
-    # Update an existing comment (The <int:pk> here refers to the Comment's primary key)
-    path('comments/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment_update'),
+    # Update an existing comment (PK refers to the Comment)
+    path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
     
-    # Delete an existing comment (The <int:pk> here refers to the Comment's primary key)
-    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
+    # Delete an existing comment (PK refers to the Comment)
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 ]
