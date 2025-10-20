@@ -128,30 +128,67 @@
 #     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
 # ]
 
+# from django.urls import path
+# from .views import (
+#     PostListView,
+#     PostDetailView,
+#     PostCreateView,
+#     PostUpdateView,
+#     PostDeleteView,
+#     CommentUpdateView,  # Import the new views
+#     CommentDeleteView,  # Import the new views
+# )
+
+# # Define the application namespace
+# app_name = 'blog'
+
+# urlpatterns = [
+#     # Post URLs
+#     path('', PostListView.as_view(), name='post_list'),
+#     path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
+#     path('new/', PostCreateView.as_view(), name='post_create'),
+#     path('<slug:slug>/edit/', PostUpdateView.as_view(), name='post_update'),
+#     path('<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),
+    
+#     # Comment URLs
+#     # We use <int:pk> here because the primary key refers to the Comment model itself
+#     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
+#     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
+# ]
+
 from django.urls import path
+from . import views
 from .views import (
     PostListView,
     PostDetailView,
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
-    CommentUpdateView,  # Import the new views
-    CommentDeleteView,  # Import the new views
+    CommentUpdateView, # Necessary to define URL path
+    CommentDeleteView, # Necessary to define URL path
 )
 
-# Define the application namespace
-app_name = 'blog'
+app_name = "blog"
 
 urlpatterns = [
-    # Post URLs
-    path('', PostListView.as_view(), name='post_list'),
-    path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
-    path('new/', PostCreateView.as_view(), name='post_create'),
-    path('<slug:slug>/edit/', PostUpdateView.as_view(), name='post_update'),
-    path('<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),
-    
-    # Comment URLs
-    # We use <int:pk> here because the primary key refers to the Comment model itself
-    path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
-    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
+    # General View
+    path('', views.home_view, name='home'),
+
+    # --- Post Views ---
+    # List of all posts
+    path('posts/', PostListView.as_view(), name='posts'),
+    # Create a new post
+    path('posts/new/', PostCreateView.as_view(), name='post_create'),
+    # Detail view (also handles Comment Creation via POST)
+    path('posts/<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
+    # Update an existing post
+    path('posts/<slug:slug>/update/', PostUpdateView.as_view(), name='post_update'),
+    # Delete an existing post
+    path('posts/<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),
+
+    # --- Comment Views ---
+    # Update an existing comment (using the comment's primary key)
+    path('comments/<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
+    # Delete an existing comment (using the comment's primary key)
+    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 ]

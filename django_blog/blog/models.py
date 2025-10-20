@@ -108,12 +108,68 @@
 # # NOTE: I am commenting out the slug field for simplicity, as managing unique slugs
 # # for every post creation/update requires more complex logic in the views/forms.
 
-from django.db import models
-from django.contrib.auth.models import User
-from django.urls import reverse
+# from django.db import models
+# from django.contrib.auth.models import User
+# from django.urls import reverse
 
-# --- Existing Post Model (Included for context and completeness) ---
+# # --- Existing Post Model (Included for context and completeness) ---
+# class Post(models.Model):
+#     # Required Fields
+#     title = models.CharField(max_length=200)
+#     content = models.TextField()
+#     published_date = models.DateTimeField(auto_now_add=True)
+
+#     # Foreign Key to Django's built-in User model
+#     # CASCADE means if the User is deleted, all their posts are also deleted.
+#     author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+#     # Optional field for better user experience
+#     slug = models.SlugField(max_length=200, unique=True, null=True, blank=True)
+
+#     class Meta:
+#         ordering = ['-published_date']  # Order posts from newest to oldest
+
+#     def __str__(self):
+#         return self.title
+
+#     def get_absolute_url(self):
+#         # We assume the post_detail URL takes the primary key (pk)
+#         return reverse('blog:post_detail', kwargs={'pk': self.pk})
+
+# # --- New Comment Model ---
+# class Comment(models.Model):
+#     # Foreign Key to Post: Many comments can belong to one post.
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    
+#     # Foreign Key to User: The user who authored the comment.
+#     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+#     # Text field for the comment content
+#     content = models.TextField()
+    
+#     # Timestamps
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+
+#     class Meta:
+#         # Order comments by creation time (oldest first)
+#         ordering = ['created_at']
+
+#     def __str__(self):
+#         # Display the author and the first 50 characters of the comment
+#         return f"Comment by {self.author.username} on '{self.post.title}'"
+
+#     def get_absolute_url(self):
+#         # Redirect back to the post detail page after creation/update
+#         return reverse('blog:post_detail', kwargs={'pk': self.post.pk})
+
+from django.db import models
+from django.contrib.auth.models import User # Import User model
+
 class Post(models.Model):
+    """
+    Model representing a single blog post.
+    """
     # Required Fields
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -127,38 +183,31 @@ class Post(models.Model):
     slug = models.SlugField(max_length=200, unique=True, null=True, blank=True)
 
     class Meta:
-        ordering = ['-published_date']  # Order posts from newest to oldest
+        ordering = ['-published_date'] # Order posts from newest to oldest
 
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
-        # We assume the post_detail URL takes the primary key (pk)
-        return reverse('blog:post_detail', kwargs={'pk': self.pk})
-
-# --- New Comment Model ---
 class Comment(models.Model):
-    # Foreign Key to Post: Many comments can belong to one post.
+    """
+    Model representing a comment on a blog post.
+    """
+    # The post this comment belongs to (many-to-one relationship)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     
-    # Foreign Key to User: The user who authored the comment.
+    # The user who wrote the comment
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    
-    # Text field for the comment content
-    content = models.TextField()
+
+    # The actual content of the comment
+    text = models.TextField(verbose_name='Your Comment')
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        # Order comments by creation time (oldest first)
-        ordering = ['created_at']
+        # Order comments with the oldest first (natural conversation flow)
+        ordering = ['created_at'] 
 
     def __str__(self):
-        # Display the author and the first 50 characters of the comment
-        return f"Comment by {self.author.username} on '{self.post.title}'"
-
-    def get_absolute_url(self):
-        # Redirect back to the post detail page after creation/update
-        return reverse('blog:post_detail', kwargs={'pk': self.post.pk})
+        return f"Comment by {self.author.username} on {self.post.title}"
