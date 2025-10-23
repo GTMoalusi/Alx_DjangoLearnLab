@@ -13,6 +13,7 @@ from django.db.models import Q # Used for complex lookups (OR conditions)
 # Import Models and Forms
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
+from taggit.models import Tag # REQUIRED: Import the Tag model for filtering
 
 
 # --- Mixins (Common functions for class-based views) ---
@@ -47,13 +48,13 @@ class PostSearchView(ListView):
     Allows searching across title, content, and tags.
     """
     model = Post
-    template_name = 'blog/post_search.html' # Don't forget to create this template!
+    template_name = 'blog/post_search.html'
     context_object_name = 'posts'
-    paginate_by = 10 # Optional: Add pagination for results
+    paginate_by = 10 
 
     def get_queryset(self):
         # Start with all Post objects
-        # queryset = Post.objects.all()
+        #queryset = Post.objects.all() # Correct starting queryset
         queryset = Post.objects.filter
         
         # Get the search query from the URL parameters (e.g., /search/?q=term)
@@ -65,9 +66,40 @@ class PostSearchView(ListView):
                 Q(title__icontains=query) |
                 Q(content__icontains=query) |
                 Q(tags__name__icontains=query)
-            ).distinct() # Use distinct() to prevent duplicate posts if they match multiple tags
+            ).distinct() 
 
         return queryset
+
+
+class PostByTagListView(ListView):
+    """
+    Displays a list of posts filtered by a specific tag slug provided in the URL.
+    """
+    model = Post
+    template_name = 'blog/post_by_tag.html' # New template needed
+    context_object_name = 'posts'
+    ordering = ['-date_created']
+    paginate_by = 5
+
+    def get_queryset(self):
+        # Get the tag slug from the URL keyword arguments
+        tag_slug = self.kwargs.get('tag_slug')
+        
+        # Filter posts that have a tag with the matching slug.
+        queryset = Post.objects.filter(tags__slug=tag_slug).order_by('-date_created')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds the tag object to the context for use in the template title.
+        """
+        context = super().get_context_data(**kwargs)
+        tag_slug = self.kwargs.get('tag_slug')
+        
+        # Get the Tag object itself to display the name in the template
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        context['tag'] = tag
+        return context
 
 
 class PostListView(ListView):

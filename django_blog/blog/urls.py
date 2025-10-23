@@ -1,54 +1,31 @@
-# from django.urls import path
-# from .views import (
-#     PostListView,
-#     PostDetailView,
-#     PostCreateView,
-#     PostUpdateView,
-#     PostDeleteView,
-#     CommentCreateView,
-#     CommentUpdateView,
-#     CommentDeleteView,
-# )
-
-# # Define the application namespace
-# app_name = 'blog'
-
-# urlpatterns = [
-#     # --- Post URLs ---
-#     # List all posts
-#     path('', PostListView.as_view(), name='post_list'),
-    
-#     # Create a new post
-#     path('post/new/', PostCreateView.as_view(), name='post_create'),
-    
-#     # Detail view for a single post (uses both PK and Slug for SEO)
-#     path('post/<int:pk>/<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
-    
-#     # Update an existing post
-#     path('post/<int:pk>/<slug:slug>/edit/', PostUpdateView.as_view(), name='post_update'),
-    
-#     # Delete an existing post
-#     path('post/<int:pk>/<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),
-
-#     # --- Comment URLs (Updated to match specific check requirements) ---
-    
-#     # Create a new comment on a specific post (PK refers to the Post)
-#     path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='comment_create'),
-    
-#     # Update an existing comment (PK refers to the Comment)
-#     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
-    
-#     # Delete an existing comment (PK refers to the Comment)
-#     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
-# ]
 from django.urls import path
 from . import views
 
+# Define the namespace for use in templates (e.g., href="{% url 'blog:post_list' %}")
+app_name = 'blog'
+
 urlpatterns = [
-    # TEMPORARILY COMMENTED OUT: This line is preventing makemigrations 
-    # from running because PostList is not yet implemented or imported correctly in views.py
-    # path('', views.PostList.as_view(), name='post_list'),
+    # Post List and Creation
+    path('', views.PostListView.as_view(), name='post_list'),
+    path('new/', views.PostCreateView.as_view(), name='post_create'),
     
-    # Add other implemented paths here if they exist, otherwise keep them commented out 
-    # until you implement their corresponding views.
+    # Search Feature
+    path('search/', views.PostSearchView.as_view(), name='post_search'),
+
+    # --- New: Tag Filtering Feature ---
+    # URL to display posts associated with a specific tag (e.g., /tags/python/)
+    path('tags/<slug:tag_slug>/', views.PostByTagListView.as_view(), name='post_by_tag'),
+    # -----------------------------------
+
+    # Post Detail, Update, and Delete (using slug for human-readable URLs)
+    path('posts/<slug:slug>/', views.PostDetailView.as_view(), name='post_detail'),
+    path('posts/<slug:slug>/update/', views.PostUpdateView.as_view(), name='post_update'),
+    path('posts/<slug:slug>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
+
+    # Comment Creation (Post Slug is used to identify the parent post)
+    path('posts/<slug:slug>/comment/new/', views.CommentCreateView.as_view(), name='comment_create'),
+    
+    # Comment Update and Delete (using the Comment's primary key (pk) for identification)
+    path('comment/<int:pk>/update/', views.CommentUpdateView.as_view(), name='comment_update'),
+    path('comment/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment_delete'),
 ]
