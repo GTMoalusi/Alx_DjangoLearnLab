@@ -53,7 +53,8 @@ class PostSearchView(ListView):
 
     def get_queryset(self):
         # Start with all Post objects
-        queryset = Post.objects.all()
+        # queryset = Post.objects.all()
+        queryset = Post.objects.filter
         
         # Get the search query from the URL parameters (e.g., /search/?q=term)
         query = self.request.GET.get('q')
