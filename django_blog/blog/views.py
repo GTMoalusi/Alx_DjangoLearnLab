@@ -33,7 +33,7 @@ class CommentAuthorRequiredMixin(UserPassesTestMixin):
     """
     def test_func(self):
         # Retrieve the object (Comment instance) that the view is operating on
-        obj = self.get_object()
+        obj = self = self.get_object()
         # Check if the current user is the author of the comment
         return obj.author == self.request.user
 
