@@ -219,6 +219,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
+from django.db.models import Q # New Import!
 
 
 # --- Mixins (Common functions for class-based views) ---
@@ -245,6 +246,35 @@ class CommentAuthorRequiredMixin(UserPassesTestMixin):
 
 
 # --- Post Views ---
+
+
+class PostSearchView(ListView):
+    """
+    Handles displaying search results for blog posts.
+    Allows searching across title, content, and tags.
+    """
+    model = Post
+    template_name = 'blog/post_search.html' # Create this template next
+    context_object_name = 'posts'
+    paginate_by = 10 # Optional: Add pagination for results
+
+    def get_queryset(self):
+        # 1. Start with all Post objects
+        queryset = super().get_queryset()
+        
+        # 2. Get the search query from the URL parameters (e.g., /search/?q=term)
+        query = self.request.GET.get('q')
+
+        if query:
+            # 3. Use Q objects to perform an OR query across multiple fields
+            # The 'i' in 'icontains' makes the search case-insensitive.
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct() # Use distinct() to prevent duplicate posts if they match multiple tags
+
+        return queryset
 
 class PostListView(ListView):
     """
@@ -362,3 +392,4 @@ class CommentDeleteView(LoginRequiredMixin, CommentAuthorRequiredMixin, DeleteVi
     def get_success_url(self):
         # Redirect back to the post detail page after deleting a comment.
         return reverse('blog:post_detail', kwargs={'slug': self.object.post.slug})
+
