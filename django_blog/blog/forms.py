@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post, Comment
 from taggit.forms import TagField 
+from taggit.forms import TagWidget # New Import
 
 class PostForm(forms.ModelForm):
     # We are adding the 'tags' field here
@@ -12,6 +13,7 @@ class PostForm(forms.ModelForm):
         fields = ('title', 'content', 'tags')
         
         widgets = {
+            'tags': TagWidget(),
             'title': forms.TextInput(attrs={'class': 'create-form-input'}),
             'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea'}),
         }
