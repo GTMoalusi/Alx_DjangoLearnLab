@@ -288,7 +288,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'taggit',
     # Step 1: Register the new 'blog' app
     'blog', 
 ]
