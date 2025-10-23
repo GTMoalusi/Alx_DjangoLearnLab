@@ -41,20 +41,14 @@
 #     # Delete an existing comment (PK refers to the Comment)
 #     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 # ]
-
 from django.urls import path
-# We import the views module which contains the PostList and PostDetail classes
 from . import views
 
-# Set an application namespace
-app_name = 'blog'
-
 urlpatterns = [
-    # URL for the list of all posts (Home Page)
-    # The view is called PostList
+    # TEMPORARILY COMMENTED OUT: This line is preventing makemigrations 
+    # from running because PostList is not yet implemented or imported correctly in views.py
     # path('', views.PostList.as_view(), name='post_list'),
     
-    # URL for a single post detail view using the unique slug
-    # The view is called PostDetail
-    # path('<slug:slug>/', views.PostDetail.as_view(), name='post_detail'),
+    # Add other implemented paths here if they exist, otherwise keep them commented out 
+    # until you implement their corresponding views.
 ]
