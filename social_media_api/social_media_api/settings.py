@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
     # Local apps (MUST be added)
     'accounts.apps.AccountsConfig', 
+    'posts',
 ]
 
 # (MIDDLEWARE, ROOT_URLCONF, TEMPLATES, DATABASES, etc. remain the same)

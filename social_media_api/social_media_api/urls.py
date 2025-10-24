@@ -15,18 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # social_media_api/urls.py
-
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    # Admin site remains at the root
+    # 1. Django Admin Interface
     path('admin/', admin.site.urls),
     
-    # --- API Version 1 Routes ---
+    # 2. API Authentication (DRF login/logout for browsable API)
+    # This is helpful for quick testing in the browser.
+    path('api-auth/', include('rest_framework.urls')),
     
-    # Include all routes from the 'accounts' app for auth and profile management
-    path('api/v1/accounts/', include('accounts.urls')),
-    
-    # Other app URLs (like 'posts' and 'comments') will be included here later
+    # 3. Posts Application Endpoints (Version 1)
+    # All post and comment routes will start with /api/v1/
+    path('api/v1/', include('posts.urls')),
 ]
