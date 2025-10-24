@@ -71,7 +71,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         post_pk = self.kwargs.get('post_pk')
         if post_pk:
             return Comment.objects.filter(post=post_pk)
-        return Comment.objects.none()
+        return Comment.objects.all()
 
     def perform_create(self, serializer):
         """
