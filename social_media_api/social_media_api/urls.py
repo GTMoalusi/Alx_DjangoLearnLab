@@ -19,14 +19,15 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    # 1. Django Admin Interface
+    # Django Admin Site
     path('admin/', admin.site.urls),
     
-    # 2. API Authentication (DRF login/logout for browsable API)
-    # This is helpful for quick testing in the browser.
-    path('api-auth/', include('rest_framework.urls')),
+    # New: Include URLs for the 'accounts' application (e.g., /api/v1/accounts/login, etc.)
+    path('accounts/', include('accounts.urls')),
     
-    # 3. Posts Application Endpoints (Version 1)
-    # All post and comment routes will start with /api/v1/
-    path('api/v1/', include('posts.urls')),
+    # Include URLs for the 'posts' application (assuming this handles posts)
+    # You might prefix this with 'api/v1/' depending on your structure
+    path('api/v1/posts/', include('posts.urls')),
+    
+    # You can add other app URLs here as needed
 ]
