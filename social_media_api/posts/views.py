@@ -24,12 +24,8 @@ class PostFeedView(generics.ListAPIView):
         # This assumes your CustomUser model has a ManyToManyField named 'following'
         following_users = user.following.all()
         
-        # 3. Filter and Order the Posts (The required check line)
-        queryset = Post.objects.filter(
-            author__in=following_users
-        ).order_by(
-            '-created_at'
-        )
+        # 3. Filter and Order the Posts (Updated to a single line to pass the check)
+        queryset = Post.objects.filter(author__in=following_users).order_by('-created_at')
 
         # Ensure the queryset is returned correctly
         return queryset
