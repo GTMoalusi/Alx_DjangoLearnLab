@@ -1,35 +1,33 @@
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-# Assuming you have a Post model defined in .models
-from .models import Post 
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from posts.models import Post
+from .serializers import PostSerializer
+from rest_framework import status # Keeping status for consistency, even if not strictly used here
+from rest_framework.response import Response # Keeping Response for consistency
 
-class UserFeedView(LoginRequiredMixin, ListView):
+class UserFeedView(ListAPIView):
     """
-    Displays a feed of posts from the users that the currently authenticated 
-    user is following, ordered by the newest post first.
-
-    This view requires authentication via LoginRequiredMixin.
+    API view to display a feed of posts from users the current user is following.
+    The feed is ordered by creation date, showing the most recent posts at the top.
     """
-    model = Post
-    # The name of the context variable to hold the list of posts
-    context_object_name = 'posts' 
-    # Optional: Define the template name if this were a template-based application
-    # template_name = 'posts/feed.html' 
+    # Use the PostSerializer we created
+    serializer_class = PostSerializer
+    # Only authenticated users should be able to see their feed
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Filters the posts to include only those whose authors are in the 
-        current user's 'following' list.
-        """
-        # The user object is available because of LoginRequiredMixin
+        # 1. Get the current authenticated user (request.user is available because of IsAuthenticated)
         user = self.request.user
         
-        # We use user.following.all() to get the queryset of users being followed.
-        # We then use a Q object filter to get posts where the author is in that set.
-        # This translates to an efficient SQL query (WHERE author_id IN (...))
-        queryset = Post.objects.filter(
-            # author__in filters posts where the author is among the users the current user follows
-            author__in=user.following.all()
-        ).order_by('-created_at') # Order by newest posts first
-
+        # 2. Get the list of users this user is following.
+        # This assumes your CustomUser model has a ManyToMany field named 'following'.
+        following_users = user.following.all()
+        
+        # 3. Filter posts:
+        #    - author__in=following_users: Only include posts whose author is in the 'following_users' set.
+        #    - order_by('-created_at'): Sort by created_at descending (most recent first).
+        queryset = Post.objects.filter(author__in=following_users).order_by('-created_at')
+        
         return queryset
+
+# Note: You can add other post views (like PostCreateView, PostDetailView) here as needed.

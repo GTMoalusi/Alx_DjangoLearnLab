@@ -2,13 +2,14 @@ from django.urls import path
 from .views import FollowUserView, UnfollowUserView
 
 urlpatterns = [
-    # POST /api/v1/accounts/<int:pk>/follow/
-    # Allows the authenticated user to follow the user specified by 'pk'.
+    # Route for following a user. 
+    # Example: POST /accounts/5/follow/ (to follow user with ID 5)
     path('<int:pk>/follow/', FollowUserView.as_view(), name='user-follow'),
     
-    # POST /api/v1/accounts/<int:pk>/unfollow/
-    # Allows the authenticated user to unfollow the user specified by 'pk'.
+    # Route for unfollowing a user.
+    # Example: POST /accounts/5/unfollow/ (to unfollow user with ID 5)
     path('<int:pk>/unfollow/', UnfollowUserView.as_view(), name='user-unfollow'),
-    
-    # Note: You would place other core account paths (registration, profile viewing, etc.) here.
 ]
+
+# Note: These URLs need to be included in your main project's urls.py 
+# under a path like 'accounts/' or similar.
