@@ -1,11 +1,36 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics # Added for GenericAPIView/RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated # Added and used as requested
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers # Added for placeholder serializer
 
 # Assuming CustomUser is defined in the same application's models
 from .models import CustomUser
+
+
+# --- PLACEHOLDER: Normally defined in serializers.py ---
+# This placeholder allows UserDetailView to run without a separate file.
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        # In a real app, you would include more fields
+        fields = ['id', 'username', 'email'] 
+# --------------------------------------------------------
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    """
+    Retrieve details for a single user (viewing a profile).
+    GET /accounts/{pk}/
+    """
+    # This uses the required CustomUser.objects.all() via queryset
+    queryset = CustomUser.objects.all() 
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
+
 
 class FollowUserView(APIView):
     """
@@ -15,10 +40,7 @@ class FollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        # The user initiating the follow action
         follower = request.user
-
-        # The user being followed
         target_user = get_object_or_404(CustomUser, pk=pk)
 
         # Prevent following self
@@ -28,20 +50,18 @@ class FollowUserView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Check if already following to prevent duplicate records
-        if follower.following.filter(pk=target_user.pk).exists():
+        # Execute the follow operation
+        if not follower.following.filter(pk=target_user.pk).exists():
+            follower.following.add(target_user)
             return Response(
-                {"detail": f"You are already following {target_user.username}."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": f"Successfully followed {target_user.username}.",
+                 "following_user_id": target_user.pk},
+                status=status.HTTP_201_CREATED
             )
-
-        # Execute the follow operation (assuming CustomUser has a 'following' ManyToMany field to 'self')
-        follower.following.add(target_user)
-
+        
         return Response(
-            {"detail": f"Successfully followed {target_user.username}.",
-             "following_user_id": target_user.pk},
-            status=status.HTTP_201_CREATED
+            {"detail": f"You are already following {target_user.username}."},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
 
@@ -53,10 +73,7 @@ class UnfollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        # The user initiating the unfollow action
         unfollower = request.user
-
-        # The user being unfollowed
         target_user = get_object_or_404(CustomUser, pk=pk)
 
         # Prevent unfollowing self
@@ -66,18 +83,16 @@ class UnfollowUserView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Check if currently following
-        if not unfollower.following.filter(pk=target_user.pk).exists():
-            return Response(
-                {"detail": f"You are not currently following {target_user.username}."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         # Execute the unfollow operation
-        unfollower.following.remove(target_user)
-
+        if unfollower.following.filter(pk=target_user.pk).exists():
+            unfollower.following.remove(target_user)
+            return Response(
+                {"detail": f"Successfully unfollowed {target_user.username}.",
+                 "unfollowed_user_id": target_user.pk},
+                status=status.HTTP_200_OK
+            )
+        
         return Response(
-            {"detail": f"Successfully unfollowed {target_user.username}.",
-             "unfollowed_user_id": target_user.pk},
-            status=status.HTTP_200_OK
+            {"detail": f"You are not currently following {target_user.username}."},
+            status=status.HTTP_400_BAD_REQUEST
         )
