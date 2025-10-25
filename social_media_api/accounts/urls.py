@@ -1,11 +1,14 @@
 from django.urls import path
-from .views import FollowUnfollowView
-from .models import CustomUser
+from .views import FollowUserView, UnfollowUserView
 
 urlpatterns = [
-    # Route for following/unfollowing a user: 
-    # POST to /api/v1/accounts/follow/<user_pk>/
-    # The 'pk' (primary key) in the URL pattern corresponds to the user 
-    # that the requesting user wants to follow or unfollow.
-    path('follow/<int:pk>/', FollowUnfollowView.as_view(), name='follow-unfollow'),
+    # POST /api/v1/accounts/{pk}/follow/
+    # Allows the authenticated user to follow the user specified by 'pk'.
+    path('<int:pk>/follow/', FollowUserView.as_view(), name='user-follow'),
+    
+    # POST /api/v1/accounts/{pk}/unfollow/
+    # Allows the authenticated user to unfollow the user specified by 'pk'.
+    path('<int:pk>/unfollow/', UnfollowUserView.as_view(), name='user-unfollow'),
+    
+    # Note: You would place other core account paths (registration, profile viewing, etc.) here.
 ]
