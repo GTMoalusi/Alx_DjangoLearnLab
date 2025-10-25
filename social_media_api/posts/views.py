@@ -57,7 +57,7 @@ class PostFeedView(generics.ListAPIView):
             '-created_at'
         )
 
-        return queryset
+      #   return queryset
 
 # --- Additional Views (Optional but common) ---
 
@@ -72,3 +72,19 @@ class PostCreateView(generics.CreateAPIView):
     # Automatically set the post's author to the logged-in user
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+def get_queryset(self):
+    user = self.request.user
+    
+    # 1. Get the users the current user is following
+    # (Assumes 'following' is a Many-to-Many field on the User model)
+    following_users = user.following.all()
+    
+    # 2. Use the missing query to filter posts and order them
+    queryset = Post.objects.filter(
+        author__in=following_users
+    ).order_by(
+        '-created_at' # Sorts by most recent first
+    )
+
+    return queryset
