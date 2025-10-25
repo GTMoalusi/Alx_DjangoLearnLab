@@ -1,98 +1,30 @@
-# from rest_framework import generics, permissions, status
-# from rest_framework.response import Response
-# from django.shortcuts import get_object_or_404
-# from .models import CustomUser  
-# from .serializers import UserSerializer # Assuming you have a basic UserSerializer
-
-# class FollowUserView(generics.GenericAPIView):
-#     """
-#     Allows an authenticated user to follow another user (specified by PK).
-#     Uses the CustomUser model's helper method for logic encapsulation.
-#     """
-#     # Required for permission checks and documentation
-#     queryset = CustomUser.objects.all() 
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request, pk, *args, **kwargs):
-#         # 1. Get the target user
-#         target_user = get_object_or_404(CustomUser, pk=pk)
-        
-#         # 2. Validation
-#         if target_user == request.user:
-#             return Response(
-#                 {"detail": "You cannot follow yourself."},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-        
-#         # 3. Use the model's helper method
-#         request.user.follow(target_user)
-
-#         return Response(
-#             {"detail": f"Successfully followed {target_user.username}.", "is_following": True},
-#             status=status.HTTP_201_CREATED
-#         )
-
-# class UnfollowUserView(generics.GenericAPIView):
-#     """
-#     Allows an authenticated user to unfollow another user (specified by PK).
-#     Uses the CustomUser model's helper method for logic encapsulation.
-#     """
-#     # Required for permission checks and documentation
-#     queryset = CustomUser.objects.all()
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request, pk, *args, **kwargs):
-#         # 1. Get the target user
-#         target_user = get_object_or_404(CustomUser, pk=pk)
-
-#         # 2. Validation
-#         if target_user == request.user:
-#             return Response(
-#                 {"detail": "You cannot unfollow yourself."},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-        
-#         # 3. Use the model's helper method
-#         # The method handles the database removal automatically.
-#         request.user.unfollow(target_user)
-
-#         return Response(
-#             {"detail": f"Successfully unfollowed {target_user.username}.", "is_following": False},
-#             status=status.HTTP_200_OK
-#         )
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings # Crucial: Import settings to reference AUTH_USER_MODEL
+from django.utils.translation import gettext_lazy as _
 
 class CustomUser(AbstractUser):
     """
-    A custom user model extending AbstractUser.
-    Includes the 'following' M2M relationship to track users being followed.
-    """
+    Extends Django's built-in AbstractUser to add custom fields.
     
-    # M2M relationship: A user follows another user (self-referential).
-    # Using settings.AUTH_USER_MODEL (a string reference) avoids the circular import 
-    # when Django loads models and sets up migrations.
+    The 'following' field creates a social graph, allowing a user 
+    to follow other users (a many-to-many relationship to itself).
+    """
+    # Inherits: username, first_name, last_name, email, is_staff, is_active, 
+    # date_joined, etc., from AbstractUser.
+
+    # Social graph field: A user follows many users, and is followed by many users.
+    # 'self' refers back to the CustomUser model itself.
     following = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='followers',
-        symmetrical=False, # Following user A doesn't mean A follows you back
-        blank=True,
+        'self',
+        symmetrical=False, # Following is not reciprocal (A follows B, but B doesn't automatically follow A)
+        related_name='followers', # The reverse relationship (who follows this user)
+        blank=True
     )
 
-    def follow(self, user_to_follow):
-        """Adds a user to the current user's following list."""
-        if self != user_to_follow:
-            self.following.add(user_to_follow)
-
-    def unfollow(self, user_to_unfollow):
-        """Removes a user from the current user's following list."""
-        self.following.remove(user_to_unfollow)
-
-    def is_following(self, user):
-        """Checks if the current user is following the specified user."""
-        return self.following.filter(pk=user.pk).exists()
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
 
     def __str__(self):
+        # Use the username as the primary string representation
         return self.username
