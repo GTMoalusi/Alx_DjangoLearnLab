@@ -1,103 +1,77 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import generics
-from rest_framework.mixins import RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated # <<<--- IMPORTED HERE
+from rest_framework import permissions # Required for IsAuthenticated
+
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
-
-# Assuming CustomUser is defined in the same application's models
 from .models import CustomUser
-
-
-# --- PLACEHOLDER: Normally defined in serializers.py ---
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        # In a real app, you would include more fields
-        fields = ['id', 'username', 'email']
-# --------------------------------------------------------
-
-
-# Uses GenericAPIView and RetrieveModelMixin
-class UserDetailView(RetrieveModelMixin, generics.GenericAPIView):
-    """
-    Retrieve details for a single user (viewing a profile).
-    GET /accounts/{pk}/
-    """
-    # Uses the requested CustomUser.objects.all() via queryset
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated] # <<<--- USAGE 1: Requires authentication
-
-    # Required method for RetrieveModelMixin
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
 
 class FollowUserView(APIView):
     """
-    Allows an authenticated user to follow another user.
-    POST /accounts/{pk}/follow/
+    Allows the authenticated user to follow another user based on their ID (pk).
+    Requires the user to be logged in.
     """
-    permission_classes = [IsAuthenticated] # <<<--- USAGE 2: Requires authentication
+    # --- Enforcing authentication ---
+    permission_classes = [permissions.IsAuthenticated]
+    # --------------------------------
 
     def post(self, request, pk):
-        follower = request.user
+        # 1. Get the target user (the one being followed)
         target_user = get_object_or_404(CustomUser, pk=pk)
-
-        # Prevent following self
+        follower = request.user
+        
+        # 2. Validation Checks
         if follower == target_user:
             return Response(
                 {"detail": "You cannot follow yourself."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Execute the follow operation
-        if not follower.following.filter(pk=target_user.pk).exists():
-            # NOTE: Assumes 'following' is a ManyToManyField on CustomUser
-            follower.following.add(target_user)
+            
+        if follower.following.filter(pk=target_user.pk).exists():
             return Response(
-                {"detail": f"Successfully followed {target_user.username}.",
-                 "following_user_id": target_user.pk},
-                status=status.HTTP_201_CREATED
+                {"detail": f"You are already following {target_user.username}."},
+                status=status.HTTP_200_OK 
             )
-
+            
+        # 3. Perform the follow action
+        follower.following.add(target_user)
+        
         return Response(
-            {"detail": f"You are already following {target_user.username}."},
-            status=status.HTTP_400_BAD_REQUEST
+            {"detail": f"You are now following {target_user.username}."},
+            status=status.HTTP_201_CREATED
         )
-
 
 class UnfollowUserView(APIView):
     """
-    Allows an authenticated user to unfollow another user.
-    POST /accounts/{pk}/unfollow/
+    Allows the authenticated user to unfollow another user based on their ID (pk).
+    Requires the user to be logged in.
     """
-    permission_classes = [IsAuthenticated] # <<<--- USAGE 3: Requires authentication
+    # --- Enforcing authentication ---
+    permission_classes = [permissions.IsAuthenticated]
+    # --------------------------------
 
     def post(self, request, pk):
-        unfollower = request.user
+        # 1. Get the target user (the one being unfollowed)
         target_user = get_object_or_404(CustomUser, pk=pk)
-
-        # Prevent unfollowing self
+        unfollower = request.user
+        
+        # 2. Validation Checks
         if unfollower == target_user:
             return Response(
                 {"detail": "You cannot unfollow yourself."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Execute the unfollow operation
-        if unfollower.following.filter(pk=target_user.pk).exists():
-            unfollower.following.remove(target_user)
+            
+        if not unfollower.following.filter(pk=target_user.pk).exists():
             return Response(
-                {"detail": f"Successfully unfollowed {target_user.username}.",
-                 "unfollowed_user_id": target_user.pk},
-                status=status.HTTP_200_OK
+                {"detail": f"You are not currently following {target_user.username}."},
+                status=status.HTTP_200_OK 
             )
-
+            
+        # 3. Perform the unfollow action
+        unfollower.following.remove(target_user)
+        
         return Response(
-            {"detail": f"You are not currently following {target_user.username}."},
-            status=status.HTTP_400_BAD_REQUEST
+            {"detail": f"You have unfollowed {target_user.username}."},
+            status=status.HTTP_200_OK
         )

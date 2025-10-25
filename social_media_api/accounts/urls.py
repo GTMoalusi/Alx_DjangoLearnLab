@@ -1,28 +1,12 @@
 from django.urls import path
-from .views import UserDetailView, FollowUserView, UnfollowUserView
-
-# Namespace for this app's URLs
-app_name = 'accounts'
+from .views import FollowUserView, UnfollowUserView
 
 urlpatterns = [
-    # GET /accounts/{pk}/ - Retrieve user details (e.g., profile view)
-    path(
-        '<int:pk>/',
-        UserDetailView.as_view(),
-        name='user-detail'
-    ),
-
-    # POST /accounts/{pk}/follow/ - Follow a user
-    path(
-        '<int:pk>/follow/',
-        FollowUserView.as_view(),
-        name='user-follow'
-    ),
-
-    # POST /accounts/{pk}/unfollow/ - Unfollow a user
-    path(
-        '<int:pk>/unfollow/',
-        UnfollowUserView.as_view(),
-        name='user-unfollow'
-    ),
+    # Route for following a user. 
+    # Example usage: POST to /api/accounts/5/follow/ (to follow user with ID 5)
+    path('<int:pk>/follow/', FollowUserView.as_view(), name='follow-user'),
+    
+    # Route for unfollowing a user.
+    # Example usage: POST to /api/accounts/5/unfollow/ (to unfollow user with ID 5)
+    path('<int:pk>/unfollow/', UnfollowUserView.as_view(), name='unfollow-user'),
 ]
