@@ -1,10 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import generics # Added for GenericAPIView/RetrieveAPIView
-from rest_framework.permissions import IsAuthenticated # Added and used as requested
+from rest_framework import generics # Provides GenericAPIView
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.permissions import IsAuthenticated # Explicitly imported and used
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers # Added for placeholder serializer
+from rest_framework import serializers
 
 # Assuming CustomUser is defined in the same application's models
 from .models import CustomUser
@@ -20,16 +21,20 @@ class UserSerializer(serializers.ModelSerializer):
 # --------------------------------------------------------
 
 
-class UserDetailView(generics.RetrieveAPIView):
+# Refactored to use GenericAPIView and RetrieveModelMixin as requested.
+class UserDetailView(RetrieveModelMixin, generics.GenericAPIView):
     """
     Retrieve details for a single user (viewing a profile).
     GET /accounts/{pk}/
     """
-    # This uses the required CustomUser.objects.all() via queryset
+    # Uses the requested CustomUser.objects.all() via queryset
     queryset = CustomUser.objects.all() 
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = 'pk'
+
+    # Required method for RetrieveModelMixin
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class FollowUserView(APIView):
@@ -37,7 +42,7 @@ class FollowUserView(APIView):
     Allows an authenticated user to follow another user.
     POST /accounts/{pk}/follow/
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # Used
 
     def post(self, request, pk):
         follower = request.user
@@ -70,7 +75,7 @@ class UnfollowUserView(APIView):
     Allows an authenticated user to unfollow another user.
     POST /accounts/{pk}/unfollow/
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] # Used
 
     def post(self, request, pk):
         unfollower = request.user
