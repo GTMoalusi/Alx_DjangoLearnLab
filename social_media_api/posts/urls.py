@@ -1,11 +1,12 @@
 from django.urls import path
-from .views import UserFeedView
+from .views import PostFeedView
 
 urlpatterns = [
-    # Route for the user's customized feed
-    path('feed/', UserFeedView.as_view(), name='user-feed'),
-
-    # You would typically add other routes here, such as:
+    # New route for the user's personalized feed/timeline.
+    # Example usage: GET to /api/posts/feed/
+    path('feed/', PostFeedView.as_view(), name='post-feed'),
+    
+    # You would typically add other routes here for standard operations like:
     # path('', PostListCreateView.as_view(), name='post-list-create'),
-    # path('<int:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
+    # path('<int:pk>/', PostDetailView.as_view(), name='post-detail'),
 ]
