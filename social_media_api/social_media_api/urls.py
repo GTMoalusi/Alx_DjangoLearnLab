@@ -28,6 +28,9 @@ urlpatterns = [
     # Include URLs for the 'posts' application (assuming this handles posts)
     # You might prefix this with 'api/v1/' depending on your structure
     path('api/v1/posts/', include('posts.urls')),
+
+    # New: Include URLs for the 'notifications' application
+    path('api/v1/notifications/', include('notifications.urls')), 
     
     # You can add other app URLs here as needed
 ]

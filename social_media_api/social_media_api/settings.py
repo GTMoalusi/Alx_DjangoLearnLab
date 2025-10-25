@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     # Local Apps
     'accounts',  # Our custom user and social graph app
     'posts',     # <--- FIX: This app is now correctly installed!
+    'notifications',
 ]
 
 MIDDLEWARE = [

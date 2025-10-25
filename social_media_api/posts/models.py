@@ -26,3 +26,27 @@ class Post(models.Model):
     def __str__(self):
         # Displaying the first 50 characters of the post content
         return f"Post by {self.author.username}: {self.content[:50]}..." 
+
+class Like(models.Model):
+    """
+    Model to represent a user liking a post.
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Ensures a user can only like a post once
+        unique_together = ('user', 'post')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} likes {self.post.content[:20]}"
