@@ -1,64 +1,59 @@
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .models import CustomUser 
-# Assuming you have a basic UserSerializer or will use one later; including it for standard practice.
-# from .serializers import UserSerializer 
 
-class FollowUserView(generics.GenericAPIView):
-    """
-    Allows an authenticated user to follow another user (specified by PK).
-    Endpoint: POST to /api/v1/accounts/{pk}/follow/
-    """
-    # Exposes the user queryset for DRF routing and documentation
-    queryset = CustomUser.objects.all() 
-    # Ensures only logged-in users can perform this action
-    permission_classes = [permissions.IsAuthenticated]
+# Get the custom user model defined in settings.AUTH_USER_MODEL
+CustomUser = get_user_model()
 
+# --- Class-Based Views for Follow Functionality ---
+
+class FollowUserView(LoginRequiredMixin, View):
+    """
+    Handles POST request to follow a user by their primary key (pk).
+    Requires the user to be authenticated.
+    """
     def post(self, request, pk, *args, **kwargs):
-        # Retrieve the user the current user wants to follow
-        target_user = get_object_or_404(CustomUser, pk=pk)
-        
-        # Prevent self-following
-        if target_user == request.user:
-            return Response(
-                {"detail": "You cannot follow yourself."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Use the CustomUser model's helper method to add the relationship
-        request.user.follow(target_user)
+        # 1. Try to retrieve the target user. Returns a 404 if not found.
+        try:
+            user_to_follow = CustomUser.objects.get(pk=pk)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'detail': 'User not found.'}, status=404)
 
-        return Response(
-            {"detail": f"Successfully followed {target_user.username}.", "is_following": True},
-            status=status.HTTP_201_CREATED
+        # 2. Prevent a user from following themselves
+        if request.user.pk == user_to_follow.pk:
+            return JsonResponse({'detail': 'Cannot follow yourself.'}, status=400)
+        
+        # 3. Add the user to the current user's 'following' list
+        # If the user is already following, .add() does nothing.
+        request.user.following.add(user_to_follow)
+        
+        return JsonResponse(
+            {'status': f'Successfully following {user_to_follow.username}.'}, 
+            status=200
         )
 
-class UnfollowUserView(generics.GenericAPIView):
-    """
-    Allows an authenticated user to unfollow another user (specified by PK).
-    Endpoint: POST to /api/v1/accounts/{pk}/unfollow/
-    """
-    # Exposes the user queryset for DRF routing and documentation
-    queryset = CustomUser.objects.all()
-    # Ensures only logged-in users can perform this action
-    permission_classes = [permissions.IsAuthenticated]
 
+class UnfollowUserView(LoginRequiredMixin, View):
+    """
+    Handles POST request to unfollow a user by their primary key (pk).
+    Requires the user to be authenticated.
+    """
     def post(self, request, pk, *args, **kwargs):
-        # Retrieve the user the current user wants to unfollow
-        target_user = get_object_or_404(CustomUser, pk=pk)
-
-        # Prevent self-unfollowing
-        if target_user == request.user:
-            return Response(
-                {"detail": "You cannot unfollow yourself."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # 1. Try to retrieve the target user. Returns a 404 if not found.
+        try:
+            user_to_unfollow = CustomUser.objects.get(pk=pk)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'detail': 'User not found.'}, status=404)
         
-        # Use the CustomUser model's helper method to remove the relationship
-        request.user.unfollow(target_user)
+        # 2. Remove the user from the current user's 'following' list
+        # If the user is not following, .remove() does nothing.
+        request.user.following.remove(user_to_unfollow)
 
-        return Response(
-            {"detail": f"Successfully unfollowed {target_user.username}.", "is_following": False},
-            status=status.HTTP_200_OK
+        return JsonResponse(
+            {'status': f'Successfully unfollowed {user_to_unfollow.username}.'}, 
+            status=200
         )
+
+# NOTE: You should ensure any other necessary views (like profile, etc.) are also in this file.
